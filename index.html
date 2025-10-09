@@ -501,7 +501,6 @@
       <button type="button" id="nextBtn">Siguiente</button>
     </div>
   </form>
-
 <script>
   const sections = document.querySelectorAll('section');
   const nextBtn = document.getElementById('nextBtn');
@@ -521,7 +520,7 @@
   function validateSection(section) {
     const requiredFields = section.querySelectorAll('[required]');
     for (const field of requiredFields) {
-      if ((field.type === 'checkbox' && !field.checked) || (!field.value.trim())) {
+      if ((field.type === 'checkbox' && !field.checked) || (!field.value || !field.value.toString().trim())) {
         field.focus();
         return false;
       }
@@ -529,26 +528,141 @@
     return true;
   }
 
-  async function sendToGoogleSheets(formData) {
-    const url = "https://script.google.com/macros/s/AKfycbzVTi6NwOR3CDzwwQGXUJ19XgxS6_Yg-4GjR8U5lOecBBjKTmOTdHtIUoKMzWZCqt3u9A/exec";
-    try {
-      const res = await fetch(url, {
-        method: "POST",
-        body: JSON.stringify(formData),
-        headers: { "Content-Type": "application/json" }
-      });
-      const data = await res.json();
-      if (data.result === "success") {
-        alert("✅ Solicitud enviada correctamente.");
-        window.location.reload();
-      } else {
-        alert("⚠️ Ocurrió un error al enviar los datos.");
+  // ---------- NUEVA FUNCIÓN: enviar mediante form oculto + iframe ----------
+  function submitFormViaIframe(formData, scriptUrl, options = {}) {
+    // devuelve Promise que se resuelve cuando el iframe envía postMessage
+    return new Promise((resolve, reject) => {
+      // 1) Crear/reciclar iframe oculto
+      let iframe = document.getElementById('gs-target-iframe');
+      if (!iframe) {
+        iframe = document.createElement('iframe');
+        iframe.id = 'gs-target-iframe';
+        iframe.name = 'gs-target-iframe';
+        iframe.style.display = 'none';
+        document.body.appendChild(iframe);
       }
-    } catch (err) {
-      alert("❌ Error de conexión: " + err.message);
-    }
+
+      // 2) Listener para recoger respuesta del Apps Script
+      function onMessage(e) {
+        // Opcional: validar e.origin si quieres más seguridad
+        window.removeEventListener('message', onMessage);
+        clearTimeout(timeoutId);
+        try {
+          if (e.data && e.data.result === 'success') {
+            resolve({ ok: true, data: e.data });
+          } else {
+            reject(new Error(e.data && e.data.message ? e.data.message : 'Error en servidor'));
+          }
+        } catch (err) {
+          reject(err);
+        }
+      }
+      window.addEventListener('message', onMessage);
+
+      // 3) Crear formulario oculto y llenarlo con campos (hidden inputs)
+      const form = document.createElement('form');
+      form.style.display = 'none';
+      form.method = 'POST';
+      form.action = scriptUrl;
+      form.target = iframe.name;
+
+      // Si usas una clave secreta (opcional), ponla aquí:
+      const SECRET = ''; // <-- si activas en Apps Script, escribe el mismo secreto aquí (nota: visible en cliente)
+
+      if (SECRET) {
+        const inSecret = document.createElement('input');
+        inSecret.type = 'hidden';
+        inSecret.name = 'secret';
+        inSecret.value = SECRET;
+        form.appendChild(inSecret);
+      }
+
+      Object.keys(formData).forEach(key => {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = key;
+        // Normalizar boolean -> "Sí"/"No" como hacías antes
+        input.value = (formData[key] === true) ? 'Sí' : (formData[key] === false ? 'No' : (formData[key] ?? ''));
+        form.appendChild(input);
+      });
+
+      document.body.appendChild(form);
+
+      // 4) Timeout por si no recibimos mensaje del iframe
+      const timeoutMs = options.timeout || 15000;
+      const timeoutId = setTimeout(() => {
+        window.removeEventListener('message', onMessage);
+        try { form.remove(); } catch(e) {}
+        reject(new Error('Timeout: no se recibió confirmación del servidor'));
+      }, timeoutMs);
+
+      // 5) Enviar
+      form.submit();
+
+      // NOTA: no removemos inmediatamente el iframe porque el response necesita cargar y ejecutar postMessage
+      // Puedes limpiar el form después de un tiempo
+      setTimeout(() => { try { form.remove(); } catch(e){} }, timeoutMs + 2000);
+    });
   }
 
+  // Reemplaza la URL por la tuya (la que obtuviste al desplegar el Web App)
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw496Fmw32LD_D9Hv3wYSzoTfYtcm7uRzFnNhOPr2FMpy8PECf2erSiT_z8H7vVV64NRQ/exec";
+
+  // Función que llena el objeto formData (idem a la tuya, la mantuve)
+  function buildFormData() {
+    return {
+      Nombre: document.querySelectorAll("input")[0].value,
+      ApellidoPaterno: document.querySelectorAll("input")[1].value,
+      ApellidoMaterno: document.querySelectorAll("input")[2].value,
+      Telefono: document.querySelectorAll("input")[3].value,
+      Email: document.querySelectorAll("input")[4].value,
+      CURP: document.querySelectorAll("input")[5].value,
+      Direccion: document.querySelectorAll("textarea")[0].value,
+      FechaNacimiento: document.querySelector('input[type="date"]').value,
+      EstadoCivil: document.getElementById("estadoCivil").value,
+      NombreConyuge: document.querySelector("#conyugeCampos input:nth-child(1)")?.value || "",
+      OcupacionConyuge: document.querySelector("#conyugeCampos input:nth-child(2)")?.value || "",
+      RFC: document.querySelectorAll("input")[8].value,
+      Nacionalidad: document.querySelectorAll("input")[9].value,
+      LugarNacimiento: document.querySelectorAll("input")[10].value,
+      LicenciaConducir: document.getElementById("licenciaConducir").value,
+      ClaseLicencia: document.querySelector("#licenciaCampos input:nth-child(1)")?.value || "",
+      NumeroLicencia: document.querySelector("#licenciaCampos input:nth-child(2)")?.value || "",
+      ManejaEstandar: document.querySelector("#licenciaCampos select")?.value || "",
+      CartillaMilitar: document.querySelectorAll("select")[5].value,
+      VisaLaser: document.querySelectorAll("select")[6].value,
+      CreditoINFONAVIT: document.getElementById("infonavit").value,
+      NumeroInfonavit: document.querySelector("#infonavitCampos input:nth-child(1)")?.value || "",
+      PagoInfonavit: document.querySelector("#infonavitCampos input:nth-child(2)")?.value || "",
+      CreditoFONACOT: document.getElementById("fonacot").value,
+      NumeroFonacot: document.querySelector("#fonacotCampos input:nth-child(1)")?.value || "",
+      PagoFonacot: document.querySelector("#fonacotCampos input:nth-child(2)")?.value || "",
+      PensionAlimenticia: document.getElementById("pension").value,
+      CantidadPension: document.querySelector("#pensionCampos input")?.value || "",
+      TipoSangre: document.querySelectorAll("select")[7].value,
+      NSS: document.querySelectorAll("input")[20].value,
+      Enfermedad: document.querySelectorAll("input")[21].value,
+      Alergias: document.querySelectorAll("input")[22].value,
+      Medicamento: document.querySelectorAll("input")[23].value,
+      ContactoNombre: document.querySelectorAll("input")[24].value,
+      ContactoParentesco: document.querySelectorAll("input")[25].value,
+      ContactoDireccion: document.querySelectorAll("input")[26].value,
+      ContactoTelefono: document.querySelectorAll("input")[27].value,
+      NivelEducativo: document.querySelectorAll("select")[8].value,
+      EstatusEscolar: document.querySelectorAll("select")[9].value,
+      Certificaciones: document.querySelectorAll("textarea")[1].value,
+      InglesHablado: document.querySelectorAll("select")[10].value,
+      InglesEscrito: document.querySelectorAll("select")[11].value,
+      Referencia1Nombre: document.querySelectorAll("input")[28].value,
+      Referencia1Telefono: document.querySelectorAll("input")[29].value,
+      Referencia2Nombre: document.querySelectorAll("input")[30].value,
+      Referencia2Telefono: document.querySelectorAll("input")[31].value,
+      DeclaracionVeracidad: document.querySelectorAll('input[type="checkbox"]')[0].checked ? "Sí" : "No",
+      DeclaracionDatos: document.querySelectorAll('input[type="checkbox"]')[1].checked ? "Sí" : "No"
+    };
+  }
+
+  // Escuchar el botón Siguiente / Enviar
   nextBtn.addEventListener('click', async () => {
     const currentSection = sections[current];
     if (!validateSection(currentSection)) {
@@ -560,59 +674,28 @@
       current++;
       showStep(current);
     } else {
-      // Crear objeto con todos los campos mapeados
-      const formData = {
-        Nombre: document.querySelectorAll("input")[0].value,
-        ApellidoPaterno: document.querySelectorAll("input")[1].value,
-        ApellidoMaterno: document.querySelectorAll("input")[2].value,
-        Telefono: document.querySelectorAll("input")[3].value,
-        Email: document.querySelectorAll("input")[4].value,
-        CURP: document.querySelectorAll("input")[5].value,
-        Direccion: document.querySelectorAll("textarea")[0].value,
-        FechaNacimiento: document.querySelector('input[type="date"]').value,
-        EstadoCivil: document.getElementById("estadoCivil").value,
-        NombreConyuge: document.querySelector("#conyugeCampos input:nth-child(1)")?.value || "",
-        OcupacionConyuge: document.querySelector("#conyugeCampos input:nth-child(2)")?.value || "",
-        RFC: document.querySelectorAll("input")[8].value,
-        Nacionalidad: document.querySelectorAll("input")[9].value,
-        LugarNacimiento: document.querySelectorAll("input")[10].value,
-        LicenciaConducir: document.getElementById("licenciaConducir").value,
-        ClaseLicencia: document.querySelector("#licenciaCampos input:nth-child(1)")?.value || "",
-        NumeroLicencia: document.querySelector("#licenciaCampos input:nth-child(2)")?.value || "",
-        ManejaEstandar: document.querySelector("#licenciaCampos select")?.value || "",
-        CartillaMilitar: document.querySelectorAll("select")[5].value,
-        VisaLaser: document.querySelectorAll("select")[6].value,
-        CreditoINFONAVIT: document.getElementById("infonavit").value,
-        NumeroInfonavit: document.querySelector("#infonavitCampos input:nth-child(1)")?.value || "",
-        PagoInfonavit: document.querySelector("#infonavitCampos input:nth-child(2)")?.value || "",
-        CreditoFONACOT: document.getElementById("fonacot").value,
-        NumeroFonacot: document.querySelector("#fonacotCampos input:nth-child(1)")?.value || "",
-        PagoFonacot: document.querySelector("#fonacotCampos input:nth-child(2)")?.value || "",
-        PensionAlimenticia: document.getElementById("pension").value,
-        CantidadPension: document.querySelector("#pensionCampos input")?.value || "",
-        TipoSangre: document.querySelectorAll("select")[7].value,
-        NSS: document.querySelectorAll("input")[20].value,
-        Enfermedad: document.querySelectorAll("input")[21].value,
-        Alergias: document.querySelectorAll("input")[22].value,
-        Medicamento: document.querySelectorAll("input")[23].value,
-        ContactoNombre: document.querySelectorAll("input")[24].value,
-        ContactoParentesco: document.querySelectorAll("input")[25].value,
-        ContactoDireccion: document.querySelectorAll("input")[26].value,
-        ContactoTelefono: document.querySelectorAll("input")[27].value,
-        NivelEducativo: document.querySelectorAll("select")[8].value,
-        EstatusEscolar: document.querySelectorAll("select")[9].value,
-        Certificaciones: document.querySelectorAll("textarea")[1].value,
-        InglesHablado: document.querySelectorAll("select")[10].value,
-        InglesEscrito: document.querySelectorAll("select")[11].value,
-        Referencia1Nombre: document.querySelectorAll("input")[28].value,
-        Referencia1Telefono: document.querySelectorAll("input")[29].value,
-        Referencia2Nombre: document.querySelectorAll("input")[30].value,
-        Referencia2Telefono: document.querySelectorAll("input")[31].value,
-        DeclaracionVeracidad: document.querySelectorAll('input[type="checkbox"]')[0].checked ? "Sí" : "No",
-        DeclaracionDatos: document.querySelectorAll('input[type="checkbox"]')[1].checked ? "Sí" : "No"
-      };
+      // último paso: armar data y enviar
+      const formData = buildFormData();
 
-      await sendToGoogleSheets(formData);
+      // Mostrar indicador de envío (puedes reemplazar por loader)
+      nextBtn.disabled = true;
+      nextBtn.textContent = 'Enviando...';
+
+      try {
+        const result = await submitFormViaIframe(formData, SCRIPT_URL, { timeout: 20000 });
+        if (result && result.ok) {
+          alert("✅ Solicitud enviada correctamente.");
+          window.location.reload();
+        } else {
+          alert("⚠️ Ocurrió un error desconocido al enviar.");
+        }
+      } catch (err) {
+        console.error(err);
+        alert("❌ Error al enviar: " + (err.message || err));
+      } finally {
+        nextBtn.disabled = false;
+        nextBtn.textContent = 'Enviar';
+      }
     }
   });
 
@@ -621,7 +704,7 @@
     showStep(current);
   });
 
-  // Condicionales dinámicos
+  // Condicionales dinámicos (los mismos)
   const estadoCivil = document.getElementById('estadoCivil');
   const conyugeCampos = document.getElementById('conyugeCampos');
   estadoCivil.addEventListener('change', () => {
@@ -654,9 +737,10 @@
 
   showStep(current);
 </script>
- 
+
 </body>
 </html>
+
 
 
 
