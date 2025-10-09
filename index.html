@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Formulario de Contratación SSPI</title>
+  <style>
+    :root {
+      --bg: #e6e9f0;
+      --shadow-light: #ffffff;
+      --shadow-dark: #b8b9be;
+      --primary: #5b4bff;
+      --text: #333;
+      --required: #d90429;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 40px;
+    }
+
+    .form-wrapper {
+      width: 100%;
+      max-width: 950px;
+      background: var(--bg);
+      border-radius: 25px;
+      box-shadow: 12px 12px 24px var(--shadow-dark),
+                  -12px -12px 24px var(--shadow-light);
+      padding: 40px 50px;
+      position: relative;
+    }
+
+    .logo-container {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .logo-container img {
+      width: 180px;
+      height: auto;
+      filter: drop-shadow(2px 2px 4px #bbb);
+    }
+
+    h1 {
+      text-align: center;
+      color: var(--text);
+      margin-bottom: 5px;
+    }
+
+    p {
+      text-align: center;
+      color: #666;
+      margin-bottom: 30px;
+    }
+
+    .progress {
+      width: 100%;
+      height: 8px;
+      border-radius: 10px;
+      background: #d1d1d6;
+      margin-bottom: 30px;
+      position: relative;
+    }
+
+    .progress-bar {
+      position: absolute;
+      height: 8px;
+      border-radius: 10px;
+      background: var(--primary);
+      width: 12.5%;
+      transition: width 0.4s ease;
+    }
+
+    section {
+      display: none;
+      animation: fade 0.4s ease;
+    }
+
+    section.active {
+      display: block;
+    }
+
+    @keyframes fade {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    h2 {
+      color: var(--text);
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 500;
+    }
+
+    label.required::after {
+      content: " *";
+      color: var(--required);
+    }
+
+    input, textarea, select {
+      width: 100%;
+      padding: 12px 15px;
+      border: none;
+      border-radius: 12px;
+      background: var(--bg);
+      box-shadow: inset 5px 5px 10px var(--shadow-dark),
+                  inset -5px -5px 10px var(--shadow-light);
+      font-size: 15px;
+      color: var(--text);
+      margin-bottom: 20px;
+    }
+
+    input:focus, textarea:focus, select:focus {
+      outline: none;
+      box-shadow: inset 3px 3px 6px var(--shadow-dark),
+                  inset -3px -3px 6px var(--shadow-light);
+    }
+
+    .row {
+      display: flex;
+      gap: 20px;
+    }
+
+    .row .half {
+      flex: 1;
+    }
+
+    .conditional {
+      display: none;
+      padding-left: 10px;
+      margin-top: -10px;
+    }
+
+    .button-group {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 30px;
+    }
+
+    button {
+      padding: 12px 30px;
+      border-radius: 12px;
+      border: none;
+      background: var(--bg);
+      color: var(--primary);
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 5px 5px 10px var(--shadow-dark),
+                  -5px -5px 10px var(--shadow-light);
+      transition: all 0.2s ease;
+    }
+
+    button:hover {
+      box-shadow: inset 5px 5px 10px var(--shadow-dark),
+                  inset -5px -5px 10px var(--shadow-light);
+    }
+
+    button:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .checkbox {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .checkbox input {
+      width: 20px;
+      height: 20px;
+      margin-top: 3px;
+    }
+
+    .alert {
+      text-align: center;
+      background: #ffd7d7;
+      color: #a30000;
+      padding: 10px 15px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      display: none;
+      box-shadow: 3px 3px 6px #ccc;
+      font-weight: 500;
+    }
+  </style>
+</head>
+<body>
+
+  <form class="form-wrapper" id="multiForm" novalidate>
+    <div class="logo-container">
+      <img src="img/LOGO GRUPO NEGRO.png" alt="Logo SSPI">
+    </div>
+
+    <h1>Formulario de Contratación</h1>
+    <p>Complete los siguientes pasos para aplicar.</p>
+
+    <div class="progress">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <div class="alert" id="alertMsg">⚠️ Por favor, complete todos los campos obligatorios antes de continuar.</div>
+
+    <!-- PASO 1 -->
+    <section class="active">
+      <h2>Datos Personales</h2>
+      <div class="row">
+        <div class="half">
+          <label class="required">Nombre(s)</label>
+          <input type="text" required>
+        </div>
+        <div class="half">
+          <label class="required">Apellido Paterno</label>
+          <input type="text" required>
+        </div>
+      </div>
+      <div class="row">
+        <div class="half">
+          <label>Apellido Materno</label>
+          <input type="text">
+        </div>
+        <div class="half">
+          <label class="required">Teléfono</label>
+          <input type="tel" required placeholder="55-1234-5678">
+        </div>
+      </div>
+      <div class="row">
+        <div class="half">
+          <label class="required">Correo Electrónico</label>
+          <input type="email" required placeholder="ejemplo@correo.com">
+        </div>
+        <div class="half">
+          <label class="required">CURP</label>
+          <input type="text" required>
+        </div>
+      </div>
+      <label class="required">Dirección Completa</label>
+      <textarea rows="2" required></textarea>
+    </section>
+
+    <!-- PASO 2 -->
+    <section>
+      <h2>Información General</h2>
+      <div class="row">
+        <div class="half">
+          <label class="required">Fecha de Nacimiento</label>
+          <input type="date" required>
+        </div>
+        <div class="half">
+          <label class="required">Estado Civil</label>
+          <select id="estadoCivil" required>
+            <option value="">Seleccione...</option>
+            <option>Soltero(a)</option>
+            <option>Casado(a)</option>
+            <option>Divorciado(a)</option>
+            <option>Viudo(a)</option>
+            <option>Unión Libre</option>
+          </select>
+        </div>
+      </div>
+      <div id="conyugeCampos" class="conditional">
+        <div class="row">
+          <div class="half">
+            <label>Nombre del Cónyuge</label>
+            <input type="text">
+          </div>
+          <div class="half">
+            <label>Ocupación del Cónyuge</label>
+            <input type="text">
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="half">
+          <label class="required">RFC</label>
+          <input type="text" required>
+        </div>
+        <div class="half">
+          <label class="required">Nacionalidad</label>
+          <input type="text" required>
+        </div>
+      </div>
+      <label class="required">Lugar de Nacimiento</label>
+      <input type="text" required>
+
+      <label>¿Cuenta con licencia para conducir?</label>
+      <select id="licenciaConducir">
+        <option>No</option>
+        <option>Sí</option>
+      </select>
+
+      <div id="licenciaCampos" class="conditional">
+        <div class="row">
+          <div class="half">
+            <label>Clase</label>
+            <input type="text">
+          </div>
+          <div class="half">
+            <label>Número</label>
+            <input type="text">
+          </div>
+        </div>
+        <label>¿Sabe manejar estándar?</label>
+        <select>
+          <option>No</option>
+          <option>Sí</option>
+        </select>
+      </div>
+
+      <div class="row">
+        <div class="half">
+          <label>¿Cuenta con cartilla militar?</label>
+          <select>
+            <option>No</option>
+            <option>Sí</option>
+          </select>
+        </div>
+        <div class="half">
+          <label>¿Cuenta con visa láser vigente?</label>
+          <select>
+            <option>No</option>
+            <option>Sí</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <!-- PASO 3 -->
+    <section>
+      <h2>Información Económica</h2>
+      <label>¿Cuenta con crédito INFONAVIT?</label>
+      <select id="infonavit">
+        <option>No</option>
+        <option>Sí</option>
+      </select>
+      <div id="infonavitCampos" class="conditional">
+        <div class="row">
+          <div class="half">
+            <label>No. de Crédito</label>
+            <input type="text">
+          </div>
+          <div class="half">
+            <label>Pago Semanal</label>
+            <input type="number">
+          </div>
+        </div>
+      </div>
+
+      <label>¿Cuenta con crédito FONACOT?</label>
+      <select id="fonacot">
+        <option>No</option>
+        <option>Sí</option>
+      </select>
+      <div id="fonacotCampos" class="conditional">
+        <div class="row">
+          <div class="half">
+            <label>No. de Crédito</label>
+            <input type="text">
+          </div>
+          <div class="half">
+            <label>Pago Semanal</label>
+            <input type="number">
+          </div>
+        </div>
+      </div>
+
+      <label>¿Tiene pensión alimenticia?</label>
+      <select id="pension">
+        <option>No</option>
+        <option>Sí</option>
+      </select>
+      <div id="pensionCampos" class="conditional">
+        <label>¿Qué cantidad paga?</label>
+        <input type="number">
+      </div>
+    </section>
+
+    <!-- PASO 4 -->
+    <section>
+      <h2>Estado de Salud</h2>
+      <label class="required">Tipo de Sangre</label>
+      <select required>
+        <option value="">Seleccione...</option>
+        <option>A+</option><option>A-</option>
+        <option>B+</option><option>B-</option>
+        <option>AB+</option><option>AB-</option>
+        <option>O+</option><option>O-</option>
+      </select>
+      <label class="required">NSS</label>
+      <input type="text" required>
+      <label>Enfermedad o condición médica</label>
+      <input type="text">
+      <label>Alergias</label>
+      <input type="text">
+      <label>Medicamento Regular</label>
+      <input type="text">
+    </section>
+
+    <!-- PASO 5 -->
+    <section>
+      <h2>Contacto de Emergencia</h2>
+      <label class="required">Nombre Completo</label>
+      <input type="text" required>
+      <label class="required">Parentesco</label>
+      <input type="text" required>
+      <label class="required">Dirección</label>
+      <input type="text" required>
+      <label class="required">Teléfono</label>
+      <input type="tel" required>
+    </section>
+
+    <!-- PASO 6 -->
+    <section>
+      <h2>Escolaridad</h2>
+      <label class="required">Nivel Educativo</label>
+      <select required>
+        <option value="">Seleccione...</option>
+        <option>Primaria</option><option>Secundaria</option>
+        <option>Preparatoria/Bachillerato</option>
+        <option>Licenciatura</option><option>Maestría</option>
+        <option>Doctorado</option>
+      </select>
+      <label class="required">Estatus</label>
+      <select required>
+        <option value="">Seleccione...</option>
+        <option>Terminado</option><option>Trunco</option><option>En curso</option>
+      </select>
+      <label>Certificaciones o Cursos</label>
+      <textarea rows="2"></textarea>
+      <div class="row">
+        <div class="half">
+          <label class="required">Inglés Hablado</label>
+          <select required>
+            <option value="">Seleccione...</option>
+            <option>Principiante</option><option>Básico</option>
+            <option>Intermedio</option><option>Avanzado</option>
+            <option>Nativo</option>
+          </select>
+        </div>
+        <div class="half">
+          <label class="required">Inglés Escrito</label>
+          <select required>
+            <option value="">Seleccione...</option>
+            <option>Principiante</option><option>Básico</option>
+            <option>Intermedio</option><option>Avanzado</option>
+            <option>Nativo</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <!-- PASO 7 -->
+    <section>
+      <h2>Referencias Personales</h2>
+      <h3>Referencia 1</h3>
+      <label class="required">Nombre Completo</label>
+      <input type="text" required>
+      <label class="required">Teléfono</label>
+      <input type="tel" required>
+
+      <h3>Referencia 2</h3>
+      <label class="required">Nombre Completo</label>
+      <input type="text" required>
+      <label class="required">Teléfono</label>
+      <input type="tel" required>
+    </section>
+
+    <!-- PASO 8 -->
+    <section>
+      <h2>Declaración</h2>
+      <div class="checkbox">
+        <input type="checkbox" required>
+        <label>Hago constar que las respuestas son verdaderas y estoy consciente de que cualquier falsedad será motivo de rechazo o despido.</label>
+      </div>
+      <div class="checkbox">
+        <input type="checkbox" required>
+        <label>Autorizo a SOPORTE Y SERVICIOS EN PRODUCTOS INDUSTRIALES, S. DE R.L. DE C.V. a recabar y usar mis datos personales conforme a la Ley Federal de Protección de Datos Personales en Posesión de los Particulares.</label>
+      </div>
+      <p style="text-align:center; margin-top:20px; color:#555;">
+        <b>Gracias por completar tu solicitud.</b><br>
+        Presiona “Enviar” para finalizar.
+      </p>
+    </section>
+
+    <div class="button-group">
+      <button type="button" id="prevBtn">Anterior</button>
+      <button type="button" id="nextBtn">Siguiente</button>
+    </div>
+  </form>
+
+<script>
+  const sections = document.querySelectorAll('section');
+  const nextBtn = document.getElementById('nextBtn');
+  const prevBtn = document.getElementById('prevBtn');
+  const progressBar = document.getElementById('progressBar');
+  const alertMsg = document.getElementById('alertMsg');
+  let current = 0;
+
+  function showStep(index) {
+    sections.forEach((sec, i) => sec.classList.toggle('active', i === index));
+    prevBtn.disabled = index === 0;
+    nextBtn.textContent = index === sections.length - 1 ? 'Enviar' : 'Siguiente';
+    progressBar.style.width = ((index + 1) / sections.length) * 100 + '%';
+    alertMsg.style.display = 'none';
+  }
+
+  function validateSection(section) {
+    const requiredFields = section.querySelectorAll('[required]');
+    for (const field of requiredFields) {
+      if ((field.type === 'checkbox' && !field.checked) || (!field.value.trim())) {
+        field.focus();
+        return false;
+      }
+    }
+    return true;
+  }
+
+  async function sendToGoogleSheets(formData) {
+    const url = "https://script.google.com/macros/s/AKfycby8X41vYzM6zBrkPrmCF4K8mGg0fOeLsIpWlhQz9j8riaXYjWg5_MCHudYE_HGBFx7BUg/exec"; // 👈 Reemplaza por tu URL real
+    try {
+      const res = await fetch(url, {
+        method: "POST",
+        body: JSON.stringify(formData),
+        headers: { "Content-Type": "application/json" }
+      });
+      const data = await res.json();
+      if (data.result === "success") {
+        alert("✅ Solicitud enviada correctamente.");
+        window.location.reload();
+      } else {
+        alert("⚠️ Ocurrió un error al enviar los datos.");
+      }
+    } catch (err) {
+      alert("❌ Error de conexión: " + err.message);
+    }
+  }
+
+  nextBtn.addEventListener('click', async () => {
+    const currentSection = sections[current];
+    if (!validateSection(currentSection)) {
+      alertMsg.style.display = 'block';
+      return;
+    }
+
+    if (current < sections.length - 1) {
+      current++;
+      showStep(current);
+    } else {
+      // Crear objeto con todos los campos mapeados
+      const formData = {
+        Nombre: document.querySelectorAll("input")[0].value,
+        ApellidoPaterno: document.querySelectorAll("input")[1].value,
+        ApellidoMaterno: document.querySelectorAll("input")[2].value,
+        Telefono: document.querySelectorAll("input")[3].value,
+        Email: document.querySelectorAll("input")[4].value,
+        CURP: document.querySelectorAll("input")[5].value,
+        Direccion: document.querySelectorAll("textarea")[0].value,
+        FechaNacimiento: document.querySelector('input[type="date"]').value,
+        EstadoCivil: document.getElementById("estadoCivil").value,
+        NombreConyuge: document.querySelector("#conyugeCampos input:nth-child(1)")?.value || "",
+        OcupacionConyuge: document.querySelector("#conyugeCampos input:nth-child(2)")?.value || "",
+        RFC: document.querySelectorAll("input")[8].value,
+        Nacionalidad: document.querySelectorAll("input")[9].value,
+        LugarNacimiento: document.querySelectorAll("input")[10].value,
+        LicenciaConducir: document.getElementById("licenciaConducir").value,
+        ClaseLicencia: document.querySelector("#licenciaCampos input:nth-child(1)")?.value || "",
+        NumeroLicencia: document.querySelector("#licenciaCampos input:nth-child(2)")?.value || "",
+        ManejaEstandar: document.querySelector("#licenciaCampos select")?.value || "",
+        CartillaMilitar: document.querySelectorAll("select")[5].value,
+        VisaLaser: document.querySelectorAll("select")[6].value,
+        CreditoINFONAVIT: document.getElementById("infonavit").value,
+        NumeroInfonavit: document.querySelector("#infonavitCampos input:nth-child(1)")?.value || "",
+        PagoInfonavit: document.querySelector("#infonavitCampos input:nth-child(2)")?.value || "",
+        CreditoFONACOT: document.getElementById("fonacot").value,
+        NumeroFonacot: document.querySelector("#fonacotCampos input:nth-child(1)")?.value || "",
+        PagoFonacot: document.querySelector("#fonacotCampos input:nth-child(2)")?.value || "",
+        PensionAlimenticia: document.getElementById("pension").value,
+        CantidadPension: document.querySelector("#pensionCampos input")?.value || "",
+        TipoSangre: document.querySelectorAll("select")[7].value,
+        NSS: document.querySelectorAll("input")[20].value,
+        Enfermedad: document.querySelectorAll("input")[21].value,
+        Alergias: document.querySelectorAll("input")[22].value,
+        Medicamento: document.querySelectorAll("input")[23].value,
+        ContactoNombre: document.querySelectorAll("input")[24].value,
+        ContactoParentesco: document.querySelectorAll("input")[25].value,
+        ContactoDireccion: document.querySelectorAll("input")[26].value,
+        ContactoTelefono: document.querySelectorAll("input")[27].value,
+        NivelEducativo: document.querySelectorAll("select")[8].value,
+        EstatusEscolar: document.querySelectorAll("select")[9].value,
+        Certificaciones: document.querySelectorAll("textarea")[1].value,
+        InglesHablado: document.querySelectorAll("select")[10].value,
+        InglesEscrito: document.querySelectorAll("select")[11].value,
+        Referencia1Nombre: document.querySelectorAll("input")[28].value,
+        Referencia1Telefono: document.querySelectorAll("input")[29].value,
+        Referencia2Nombre: document.querySelectorAll("input")[30].value,
+        Referencia2Telefono: document.querySelectorAll("input")[31].value,
+        DeclaracionVeracidad: document.querySelectorAll('input[type="checkbox"]')[0].checked ? "Sí" : "No",
+        DeclaracionDatos: document.querySelectorAll('input[type="checkbox"]')[1].checked ? "Sí" : "No"
+      };
+
+      await sendToGoogleSheets(formData);
+    }
+  });
+
+  prevBtn.addEventListener('click', () => {
+    if (current > 0) current--;
+    showStep(current);
+  });
+
+  // Condicionales dinámicos
+  const estadoCivil = document.getElementById('estadoCivil');
+  const conyugeCampos = document.getElementById('conyugeCampos');
+  estadoCivil.addEventListener('change', () => {
+    conyugeCampos.style.display = estadoCivil.value === 'Casado(a)' ? 'block' : 'none';
+  });
+
+  const licencia = document.getElementById('licenciaConducir');
+  const licenciaCampos = document.getElementById('licenciaCampos');
+  licencia.addEventListener('change', () => {
+    licenciaCampos.style.display = licencia.value === 'Sí' ? 'block' : 'none';
+  });
+
+  const infonavit = document.getElementById('infonavit');
+  const infonavitCampos = document.getElementById('infonavitCampos');
+  infonavit.addEventListener('change', () => {
+    infonavitCampos.style.display = infonavit.value === 'Sí' ? 'block' : 'none';
+  });
+
+  const fonacot = document.getElementById('fonacot');
+  const fonacotCampos = document.getElementById('fonacotCampos');
+  fonacot.addEventListener('change', () => {
+    fonacotCampos.style.display = fonacot.value === 'Sí' ? 'block' : 'none';
+  });
+
+  const pension = document.getElementById('pension');
+  const pensionCampos = document.getElementById('pensionCampos');
+  pension.addEventListener('change', () => {
+    pensionCampos.style.display = pension.value === 'Sí' ? 'block' : 'none';
+  });
+
+  showStep(current);
+</script>
+ 
+</body>
+</html>
+
+
