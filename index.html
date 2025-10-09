@@ -530,7 +530,7 @@
   }
 
   async function sendToGoogleSheets(formData) {
-    const url = "https://script.google.com/macros/s/AKfycbzVTi6NwOR3CDzwwQGXUJ19XgxS6_Yg-4GjR8U5lOecBBjKTmOTdHtIUoKMzWZCqt3u9A/exec"; // 👈 Reemplaza por tu URL real
+    const url = "https://corsproxy.io/?" + encodeURIComponent("https://script.google.com/macros/s/AKfycbzVTi6NwOR3CDzwwQGXUJ19XgxS6_Yg-4GjR8U5lOecBBjKTmOTdHtIUoKMzWZCqt3u9A/exec");
     try {
       const res = await fetch(url, {
         method: "POST",
@@ -657,6 +657,7 @@
  
 </body>
 </html>
+
 
 
 
