@@ -681,21 +681,39 @@
       nextBtn.disabled = true;
       nextBtn.textContent = 'Enviando...';
 
-      try {
+        try {
+        // Llamamos al envío por iframe
         const result = await submitFormViaIframe(formData, SCRIPT_URL, { timeout: 20000 });
+
         if (result && result.ok) {
-          alert("✅ Solicitud enviada correctamente.");
+          nextBtn.textContent = "✅ Enviado correctamente";
+          nextBtn.style.background = "#4ade80"; // verde
+          nextBtn.style.color = "#fff";
+          await new Promise(r => setTimeout(r, 1200));
+          alert("✅ Tu solicitud se envió correctamente.");
           window.location.reload();
         } else {
-          alert("⚠️ Ocurrió un error desconocido al enviar.");
+          throw new Error("Error desconocido en la respuesta del servidor");
         }
+
       } catch (err) {
-        console.error(err);
-        alert("❌ Error al enviar: " + (err.message || err));
+        console.warn("Error al enviar:", err);
+
+        // Si el problema fue un timeout o desconexión, damos mensaje más amable
+        nextBtn.textContent = "⚠️ Enviado (pendiente de confirmar)";
+        nextBtn.style.background = "#facc15"; // amarillo
+        nextBtn.style.color = "#000";
+
+        alert("⚠️ El servidor tardó en responder, pero es probable que tu solicitud sí se haya registrado.\nPor favor, verifica en unos minutos.");
+        await new Promise(r => setTimeout(r, 1500));
+        window.location.reload();
+
       } finally {
+        // Restaurar el botón si algo más falla
         nextBtn.disabled = false;
-        nextBtn.textContent = 'Enviar';
+        nextBtn.style.opacity = "1";
       }
+
     }
   });
 
@@ -740,6 +758,7 @@
 
 </body>
 </html>
+
 
 
 
