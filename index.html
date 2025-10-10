@@ -221,35 +221,35 @@
       <div class="row">
         <div class="half">
           <label class="required">Nombre(s)</label>
-          <input type="text" required>
+          <input type="text" name="Nombre" required>
         </div>
         <div class="half">
           <label class="required">Apellido Paterno</label>
-          <input type="text" required>
+          <input type="text" name="ApellidoPaterno" required>
         </div>
       </div>
       <div class="row">
         <div class="half">
           <label>Apellido Materno</label>
-          <input type="text">
+          <input type="text" name="ApellidoMaterno">
         </div>
         <div class="half">
           <label class="required">Teléfono</label>
-          <input type="tel" required placeholder="55-1234-5678">
+          <input type="tel" name="Telefono" required placeholder="55-1234-5678">
         </div>
       </div>
       <div class="row">
         <div class="half">
           <label class="required">Correo Electrónico</label>
-          <input type="email" required placeholder="ejemplo@correo.com">
+          <input type="email" name="Email" required placeholder="ejemplo@correo.com">
         </div>
         <div class="half">
           <label class="required">CURP</label>
-          <input type="text" required>
+          <input type="text" name="CURP" required>
         </div>
       </div>
       <label class="required">Dirección Completa</label>
-      <textarea rows="2" required></textarea>
+      <textarea rows="2" name="Direccion" required></textarea>
     </section>
 
     <!-- PASO 2 -->
@@ -258,11 +258,11 @@
       <div class="row">
         <div class="half">
           <label class="required">Fecha de Nacimiento</label>
-          <input type="date" required>
+          <input type="date" name="FechaNacimiento" required>
         </div>
         <div class="half">
           <label class="required">Estado Civil</label>
-          <select id="estadoCivil" required>
+          <select id="estadoCivil" name="EstadoCivil" required>
             <option value="">Seleccione...</option>
             <option>Soltero(a)</option>
             <option>Casado(a)</option>
@@ -276,29 +276,29 @@
         <div class="row">
           <div class="half">
             <label>Nombre del Cónyuge</label>
-            <input type="text">
+            <input type="text" name="NombreConyuge">
           </div>
           <div class="half">
             <label>Ocupación del Cónyuge</label>
-            <input type="text">
+            <input type="text" name="OcupacionConyuge">
           </div>
         </div>
       </div>
       <div class="row">
         <div class="half">
           <label class="required">RFC</label>
-          <input type="text" required>
+          <input type="text" name="RFC" required>
         </div>
         <div class="half">
           <label class="required">Nacionalidad</label>
-          <input type="text" required>
+          <input type="text" name="Nacionalidad" required>
         </div>
       </div>
       <label class="required">Lugar de Nacimiento</label>
-      <input type="text" required>
+      <input type="text" name="LugarNacimiento" required>
 
       <label>¿Cuenta con licencia para conducir?</label>
-      <select id="licenciaConducir">
+      <select id="licenciaConducir" name="LicenciaConducir">
         <option>No</option>
         <option>Sí</option>
       </select>
@@ -307,15 +307,15 @@
         <div class="row">
           <div class="half">
             <label>Clase</label>
-            <input type="text">
+            <input type="text" name="ClaseLicencia">
           </div>
           <div class="half">
             <label>Número</label>
-            <input type="text">
+            <input type="text" name="NumeroLicencia">
           </div>
         </div>
         <label>¿Sabe manejar estándar?</label>
-        <select>
+        <select name="ManejaEstandar">
           <option>No</option>
           <option>Sí</option>
         </select>
@@ -324,14 +324,14 @@
       <div class="row">
         <div class="half">
           <label>¿Cuenta con cartilla militar?</label>
-          <select>
+          <select name="CartillaMilitar">
             <option>No</option>
             <option>Sí</option>
           </select>
         </div>
         <div class="half">
           <label>¿Cuenta con visa láser vigente?</label>
-          <select>
+          <select name="VisaLaser">
             <option>No</option>
             <option>Sí</option>
           </select>
@@ -343,7 +343,7 @@
     <section>
       <h2>Información Económica</h2>
       <label>¿Cuenta con crédito INFONAVIT?</label>
-      <select id="infonavit">
+      <select id="infonavit" name="CreditoINFONAVIT">
         <option>No</option>
         <option>Sí</option>
       </select>
@@ -351,17 +351,17 @@
         <div class="row">
           <div class="half">
             <label>No. de Crédito</label>
-            <input type="text">
+            <input type="text" name="NumeroInfonavit">
           </div>
           <div class="half">
             <label>Pago Semanal</label>
-            <input type="number">
+            <input type="number" name="PagoInfonavit">
           </div>
         </div>
       </div>
 
       <label>¿Cuenta con crédito FONACOT?</label>
-      <select id="fonacot">
+      <select id="fonacot" name="CreditoFONACOT">
         <option>No</option>
         <option>Sí</option>
       </select>
@@ -369,23 +369,23 @@
         <div class="row">
           <div class="half">
             <label>No. de Crédito</label>
-            <input type="text">
+            <input type="text" name="NumeroFonacot">
           </div>
           <div class="half">
             <label>Pago Semanal</label>
-            <input type="number">
+            <input type="number" name="PagoFonacot">
           </div>
         </div>
       </div>
 
       <label>¿Tiene pensión alimenticia?</label>
-      <select id="pension">
+      <select id="pension" name="PensionAlimenticia">
         <option>No</option>
         <option>Sí</option>
       </select>
       <div id="pensionCampos" class="conditional">
         <label>¿Qué cantidad paga?</label>
-        <input type="number">
+        <input type="number" name="CantidadPension">
       </div>
     </section>
 
@@ -393,7 +393,7 @@
     <section>
       <h2>Estado de Salud</h2>
       <label class="required">Tipo de Sangre</label>
-      <select required>
+      <select name="TipoSangre" required>
         <option value="">Seleccione...</option>
         <option>A+</option><option>A-</option>
         <option>B+</option><option>B-</option>
@@ -401,33 +401,33 @@
         <option>O+</option><option>O-</option>
       </select>
       <label class="required">NSS</label>
-      <input type="text" required>
+      <input type="text" name="NSS" required>
       <label>Enfermedad o condición médica</label>
-      <input type="text">
+      <input type="text" name="Enfermedad">
       <label>Alergias</label>
-      <input type="text">
+      <input type="text" name="Alergias">
       <label>Medicamento Regular</label>
-      <input type="text">
+      <input type="text" name="Medicamento">
     </section>
 
     <!-- PASO 5 -->
     <section>
       <h2>Contacto de Emergencia</h2>
       <label class="required">Nombre Completo</label>
-      <input type="text" required>
+      <input type="text" name="ContactoNombre" required>
       <label class="required">Parentesco</label>
-      <input type="text" required>
+      <input type="text" name="ContactoParentesco" required>
       <label class="required">Dirección</label>
-      <input type="text" required>
+      <input type="text" name="ContactoDireccion" required>
       <label class="required">Teléfono</label>
-      <input type="tel" required>
+      <input type="tel" name="ContactoTelefono" required>
     </section>
 
     <!-- PASO 6 -->
     <section>
       <h2>Escolaridad</h2>
       <label class="required">Nivel Educativo</label>
-      <select required>
+      <select name="NivelEducativo" required>
         <option value="">Seleccione...</option>
         <option>Primaria</option><option>Secundaria</option>
         <option>Preparatoria/Bachillerato</option>
@@ -435,16 +435,16 @@
         <option>Doctorado</option>
       </select>
       <label class="required">Estatus</label>
-      <select required>
+      <select name="EstatusEscolar" required>
         <option value="">Seleccione...</option>
         <option>Terminado</option><option>Trunco</option><option>En curso</option>
       </select>
       <label>Certificaciones o Cursos</label>
-      <textarea rows="2"></textarea>
+      <textarea rows="2" name="Certificaciones"></textarea>
       <div class="row">
         <div class="half">
           <label class="required">Inglés Hablado</label>
-          <select required>
+          <select name="InglesHablado" required>
             <option value="">Seleccione...</option>
             <option>Principiante</option><option>Básico</option>
             <option>Intermedio</option><option>Avanzado</option>
@@ -453,7 +453,7 @@
         </div>
         <div class="half">
           <label class="required">Inglés Escrito</label>
-          <select required>
+          <select name="InglesEscrito"> required>
             <option value="">Seleccione...</option>
             <option>Principiante</option><option>Básico</option>
             <option>Intermedio</option><option>Avanzado</option>
@@ -468,26 +468,26 @@
       <h2>Referencias Personales</h2>
       <h3>Referencia 1</h3>
       <label class="required">Nombre Completo</label>
-      <input type="text" required>
+      <input type="text" name="Referencia1Nombre" required>
       <label class="required">Teléfono</label>
-      <input type="tel" required>
+      <input type="tel" name="Referencia1Telefono" required>
 
       <h3>Referencia 2</h3>
       <label class="required">Nombre Completo</label>
-      <input type="text" required>
+      <input type="text" name="Referencia2Nombre" required>
       <label class="required">Teléfono</label>
-      <input type="tel" required>
+      <input type="tel" name="Referencia2Telefono" required>
     </section>
 
     <!-- PASO 8 -->
     <section>
       <h2>Declaración</h2>
       <div class="checkbox">
-        <input type="checkbox" required>
+        <input type="checkbox" name="DeclaracionVeracidad" required>
         <label>Hago constar que las respuestas son verdaderas y estoy consciente de que cualquier falsedad será motivo de rechazo o despido.</label>
       </div>
       <div class="checkbox">
-        <input type="checkbox" required>
+        <input type="checkbox" name="DeclaracionDatos" required>
         <label>Autorizo a SOPORTE Y SERVICIOS EN PRODUCTOS INDUSTRIALES, S. DE R.L. DE C.V. a recabar y usar mis datos personales conforme a la Ley Federal de Protección de Datos Personales en Posesión de los Particulares.</label>
       </div>
       <p style="text-align:center; margin-top:20px; color:#555;">
@@ -758,6 +758,7 @@
 
 </body>
 </html>
+
 
 
 
