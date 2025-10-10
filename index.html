@@ -501,7 +501,8 @@
       <button type="button" id="nextBtn">Siguiente</button>
     </div>
   </form>
-<script>
+
+  <script>
   const sections = document.querySelectorAll('section');
   const nextBtn = document.getElementById('nextBtn');
   const prevBtn = document.getElementById('prevBtn');
@@ -509,6 +510,7 @@
   const alertMsg = document.getElementById('alertMsg');
   let current = 0;
 
+  // Mostrar la sección actual y actualizar botones / barra
   function showStep(index) {
     sections.forEach((sec, i) => sec.classList.toggle('active', i === index));
     prevBtn.disabled = index === 0;
@@ -517,6 +519,7 @@
     alertMsg.style.display = 'none';
   }
 
+  // Validación de campos requeridos
   function validateSection(section) {
     const requiredFields = section.querySelectorAll('[required]');
     for (const field of requiredFields) {
@@ -528,11 +531,9 @@
     return true;
   }
 
-  // ---------- NUEVA FUNCIÓN: enviar mediante form oculto + iframe ----------
+  // Envío mediante form oculto + iframe (sin CORS)
   function submitFormViaIframe(formData, scriptUrl, options = {}) {
-    // devuelve Promise que se resuelve cuando el iframe envía postMessage
     return new Promise((resolve, reject) => {
-      // 1) Crear/reciclar iframe oculto
       let iframe = document.getElementById('gs-target-iframe');
       if (!iframe) {
         iframe = document.createElement('iframe');
@@ -542,16 +543,14 @@
         document.body.appendChild(iframe);
       }
 
-      // 2) Listener para recoger respuesta del Apps Script
       function onMessage(e) {
-        // Opcional: validar e.origin si quieres más seguridad
         window.removeEventListener('message', onMessage);
         clearTimeout(timeoutId);
         try {
           if (e.data && e.data.result === 'success') {
             resolve({ ok: true, data: e.data });
           } else {
-            reject(new Error(e.data && e.data.message ? e.data.message : 'Error en servidor'));
+            reject(new Error(e.data?.message || 'Error en servidor'));
           }
         } catch (err) {
           reject(err);
@@ -559,110 +558,52 @@
       }
       window.addEventListener('message', onMessage);
 
-      // 3) Crear formulario oculto y llenarlo con campos (hidden inputs)
       const form = document.createElement('form');
       form.style.display = 'none';
       form.method = 'POST';
       form.action = scriptUrl;
       form.target = iframe.name;
 
-      // Si usas una clave secreta (opcional), ponla aquí:
-      const SECRET = ''; // <-- si activas en Apps Script, escribe el mismo secreto aquí (nota: visible en cliente)
-
-      if (SECRET) {
-        const inSecret = document.createElement('input');
-        inSecret.type = 'hidden';
-        inSecret.name = 'secret';
-        inSecret.value = SECRET;
-        form.appendChild(inSecret);
-      }
-
       Object.keys(formData).forEach(key => {
         const input = document.createElement('input');
         input.type = 'hidden';
         input.name = key;
-        // Normalizar boolean -> "Sí"/"No" como hacías antes
-        input.value = (formData[key] === true) ? 'Sí' : (formData[key] === false ? 'No' : (formData[key] ?? ''));
+        input.value = formData[key] ?? '';
         form.appendChild(input);
       });
 
       document.body.appendChild(form);
 
-      // 4) Timeout por si no recibimos mensaje del iframe
       const timeoutMs = options.timeout || 15000;
       const timeoutId = setTimeout(() => {
         window.removeEventListener('message', onMessage);
-        try { form.remove(); } catch(e) {}
         reject(new Error('Timeout: no se recibió confirmación del servidor'));
       }, timeoutMs);
 
-      // 5) Enviar
       form.submit();
-
-      // NOTA: no removemos inmediatamente el iframe porque el response necesita cargar y ejecutar postMessage
-      // Puedes limpiar el form después de un tiempo
       setTimeout(() => { try { form.remove(); } catch(e){} }, timeoutMs + 2000);
     });
   }
 
-  // Reemplaza la URL por la tuya (la que obtuviste al desplegar el Web App)
+  // URL del Web App desplegado
   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw496Fmw32LD_D9Hv3wYSzoTfYtcm7uRzFnNhOPr2FMpy8PECf2erSiT_z8H7vVV64NRQ/exec";
 
-  // Función que llena el objeto formData (idem a la tuya, la mantuve)
+  // Construye formData automáticamente leyendo los name=""
   function buildFormData() {
-    return {
-      Nombre: document.querySelectorAll("input")[0].value,
-      ApellidoPaterno: document.querySelectorAll("input")[1].value,
-      ApellidoMaterno: document.querySelectorAll("input")[2].value,
-      Telefono: document.querySelectorAll("input")[3].value,
-      Email: document.querySelectorAll("input")[4].value,
-      CURP: document.querySelectorAll("input")[5].value,
-      Direccion: document.querySelectorAll("textarea")[0].value,
-      FechaNacimiento: document.querySelector('input[type="date"]').value,
-      EstadoCivil: document.getElementById("estadoCivil").value,
-      NombreConyuge: document.querySelector("#conyugeCampos input:nth-child(1)")?.value || "",
-      OcupacionConyuge: document.querySelector("#conyugeCampos input:nth-child(2)")?.value || "",
-      RFC: document.querySelectorAll("input")[8].value,
-      Nacionalidad: document.querySelectorAll("input")[9].value,
-      LugarNacimiento: document.querySelectorAll("input")[10].value,
-      LicenciaConducir: document.getElementById("licenciaConducir").value,
-      ClaseLicencia: document.querySelector("#licenciaCampos input:nth-child(1)")?.value || "",
-      NumeroLicencia: document.querySelector("#licenciaCampos input:nth-child(2)")?.value || "",
-      ManejaEstandar: document.querySelector("#licenciaCampos select")?.value || "",
-      CartillaMilitar: document.querySelectorAll("select")[5].value,
-      VisaLaser: document.querySelectorAll("select")[6].value,
-      CreditoINFONAVIT: document.getElementById("infonavit").value,
-      NumeroInfonavit: document.querySelector("#infonavitCampos input:nth-child(1)")?.value || "",
-      PagoInfonavit: document.querySelector("#infonavitCampos input:nth-child(2)")?.value || "",
-      CreditoFONACOT: document.getElementById("fonacot").value,
-      NumeroFonacot: document.querySelector("#fonacotCampos input:nth-child(1)")?.value || "",
-      PagoFonacot: document.querySelector("#fonacotCampos input:nth-child(2)")?.value || "",
-      PensionAlimenticia: document.getElementById("pension").value,
-      CantidadPension: document.querySelector("#pensionCampos input")?.value || "",
-      TipoSangre: document.querySelectorAll("select")[7].value,
-      NSS: document.querySelectorAll("input")[20].value,
-      Enfermedad: document.querySelectorAll("input")[21].value,
-      Alergias: document.querySelectorAll("input")[22].value,
-      Medicamento: document.querySelectorAll("input")[23].value,
-      ContactoNombre: document.querySelectorAll("input")[24].value,
-      ContactoParentesco: document.querySelectorAll("input")[25].value,
-      ContactoDireccion: document.querySelectorAll("input")[26].value,
-      ContactoTelefono: document.querySelectorAll("input")[27].value,
-      NivelEducativo: document.querySelectorAll("select")[8].value,
-      EstatusEscolar: document.querySelectorAll("select")[9].value,
-      Certificaciones: document.querySelectorAll("textarea")[1].value,
-      InglesHablado: document.querySelectorAll("select")[10].value,
-      InglesEscrito: document.querySelectorAll("select")[11].value,
-      Referencia1Nombre: document.querySelectorAll("input")[28].value,
-      Referencia1Telefono: document.querySelectorAll("input")[29].value,
-      Referencia2Nombre: document.querySelectorAll("input")[30].value,
-      Referencia2Telefono: document.querySelectorAll("input")[31].value,
-      DeclaracionVeracidad: document.querySelectorAll('input[type="checkbox"]')[0].checked ? "Sí" : "No",
-      DeclaracionDatos: document.querySelectorAll('input[type="checkbox"]')[1].checked ? "Sí" : "No"
-    };
+    const formData = {};
+    document.querySelectorAll('input, select, textarea').forEach(el => {
+      const key = el.name?.trim();
+      if (!key) return; // ignorar si no tiene name
+      if (el.type === 'checkbox') {
+        formData[key] = el.checked ? 'Sí' : 'No';
+      } else {
+        formData[key] = el.value || '';
+      }
+    });
+    return formData;
   }
 
-  // Escuchar el botón Siguiente / Enviar
+  // Manejo de botones siguiente / enviar
   nextBtn.addEventListener('click', async () => {
     const currentSection = sections[current];
     if (!validateSection(currentSection)) {
@@ -674,20 +615,15 @@
       current++;
       showStep(current);
     } else {
-      // último paso: armar data y enviar
       const formData = buildFormData();
-
-      // Mostrar indicador de envío (puedes reemplazar por loader)
       nextBtn.disabled = true;
       nextBtn.textContent = 'Enviando...';
 
-        try {
-        // Llamamos al envío por iframe
+      try {
         const result = await submitFormViaIframe(formData, SCRIPT_URL, { timeout: 20000 });
-
         if (result && result.ok) {
           nextBtn.textContent = "✅ Enviado correctamente";
-          nextBtn.style.background = "#4ade80"; // verde
+          nextBtn.style.background = "#4ade80";
           nextBtn.style.color = "#fff";
           await new Promise(r => setTimeout(r, 1200));
           alert("✅ Tu solicitud se envió correctamente.");
@@ -698,22 +634,16 @@
 
       } catch (err) {
         console.warn("Error al enviar:", err);
-
-        // Si el problema fue un timeout o desconexión, damos mensaje más amable
         nextBtn.textContent = "⚠️ Enviado (pendiente de confirmar)";
-        nextBtn.style.background = "#facc15"; // amarillo
+        nextBtn.style.background = "#facc15";
         nextBtn.style.color = "#000";
-
         alert("⚠️ El servidor tardó en responder, pero es probable que tu solicitud sí se haya registrado.\nPor favor, verifica en unos minutos.");
         await new Promise(r => setTimeout(r, 1500));
         window.location.reload();
-
       } finally {
-        // Restaurar el botón si algo más falla
         nextBtn.disabled = false;
         nextBtn.style.opacity = "1";
       }
-
     }
   });
 
@@ -722,7 +652,7 @@
     showStep(current);
   });
 
-  // Condicionales dinámicos (los mismos)
+  // Campos condicionales dinámicos
   const estadoCivil = document.getElementById('estadoCivil');
   const conyugeCampos = document.getElementById('conyugeCampos');
   estadoCivil.addEventListener('change', () => {
@@ -756,8 +686,10 @@
   showStep(current);
 </script>
 
+
 </body>
 </html>
+
 
 
 
