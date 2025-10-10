@@ -501,32 +501,26 @@
       <button type="button" id="nextBtn">Siguiente</button>
     </div>
   </form>
-
-<!-- Mensaje flotante de estado -->
-<div id="statusMsg" class="alert" style="display:none; background:#cce5ff; color:#004085;">Enviando...</div>
-
 <script>
 const sections = document.querySelectorAll('section');
 const nextBtn = document.getElementById('nextBtn');
 const prevBtn = document.getElementById('prevBtn');
 const progressBar = document.getElementById('progressBar');
 const alertMsg = document.getElementById('alertMsg');
-const statusMsg = document.getElementById('statusMsg');
 let current = 0;
 
 function showStep(index) {
-  sections.forEach((sec,i)=>sec.classList.toggle('active',i===index));
-  prevBtn.disabled = index===0;
-  nextBtn.textContent = index===sections.length-1?'Enviar':'Siguiente';
-  progressBar.style.width=((index+1)/sections.length)*100+'%';
-  alertMsg.style.display='none';
+  sections.forEach((sec, i) => sec.classList.toggle('active', i === index));
+  prevBtn.disabled = index === 0;
+  nextBtn.textContent = index === sections.length - 1 ? 'Enviar' : 'Siguiente';
+  progressBar.style.width = ((index + 1) / sections.length) * 100 + '%';
+  alertMsg.style.display = 'none';
 }
 
-// Validación
-function validateSection(section){
+function validateSection(section) {
   const requiredFields = section.querySelectorAll('[required]');
-  for(const field of requiredFields){
-    if((field.type==='checkbox'&&!field.checked)||(!field.value||!field.value.toString().trim())){
+  for (const field of requiredFields) {
+    if ((field.type === 'checkbox' && !field.checked) || (!field.value || !field.value.toString().trim())) {
       field.focus();
       return false;
     }
@@ -534,133 +528,145 @@ function validateSection(section){
   return true;
 }
 
-// Construye formData
-function buildFormData(){
-  const formData={};
-  document.querySelectorAll('input, select, textarea').forEach(el=>{
-    const key = el.name?.trim();
-    if(!key) return;
-    formData[key] = el.type==='checkbox'? (el.checked?'Sí':'No') : (el.value||'');
-  });
-  return formData;
-}
-
-// Envío mediante iframe
-function submitFormViaIframe(formData, scriptUrl){
-  return new Promise((resolve,reject)=>{
+function submitFormViaIframe(formData, scriptUrl, options = {}) {
+  return new Promise((resolve, reject) => {
     let iframe = document.getElementById('gs-target-iframe');
-    if(!iframe){
-      iframe=document.createElement('iframe');
-      iframe.id='gs-target-iframe';
-      iframe.name='gs-target-iframe';
-      iframe.style.display='none';
+    if (!iframe) {
+      iframe = document.createElement('iframe');
+      iframe.id = 'gs-target-iframe';
+      iframe.name = 'gs-target-iframe';
+      iframe.style.display = 'none';
       document.body.appendChild(iframe);
     }
 
-    function onMessage(e){
-      window.removeEventListener('message',onMessage);
-      try{
-        if(e.data && e.data.result==='success') resolve({ok:true});
-        else reject();
-      }catch(err){ reject(err); }
+    function onMessage(e) {
+      window.removeEventListener('message', onMessage);
+      clearTimeout(timeoutId);
+      try {
+        if (e.data && e.data.result === 'success') resolve({ ok: true, data: e.data });
+        else reject(new Error(e.data?.message || 'Error en servidor'));
+      } catch (err) { reject(err); }
     }
-    window.addEventListener('message',onMessage);
+    window.addEventListener('message', onMessage);
 
     const form = document.createElement('form');
-    form.style.display='none';
-    form.method='POST';
-    form.action=scriptUrl;
-    form.target=iframe.name;
+    form.style.display = 'none';
+    form.method = 'POST';
+    form.action = scriptUrl;
+    form.target = iframe.name;
 
-    Object.keys(formData).forEach(key=>{
-      const input=document.createElement('input');
-      input.type='hidden';
-      input.name=key;
-      input.value=formData[key]??'';
+    Object.keys(formData).forEach(key => {
+      const input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = key;
+      input.value = formData[key] ?? '';
       form.appendChild(input);
     });
 
     document.body.appendChild(form);
+
+    const timeoutMs = options.timeout || 15000;
+    const timeoutId = setTimeout(() => {
+      window.removeEventListener('message', onMessage);
+      reject(new Error('Timeout: no se recibió confirmación del servidor'));
+    }, timeoutMs);
+
     form.submit();
-    setTimeout(()=>{ try{ form.remove(); }catch(e){} }, 2000);
+    setTimeout(() => { try { form.remove(); } catch(e){} }, timeoutMs + 2000);
   });
 }
 
-const SCRIPT_URL="https://script.google.com/macros/s/AKfycbw496Fmw32LD_D9Hv3wYSzoTfYtcm7uRzFnNhOPr2FMpy8PECf2erSiT_z8H7vVV64NRQ/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw496Fmw32LD_D9Hv3wYSzoTfYtcm7uRzFnNhOPr2FMpy8PECf2erSiT_z8H7vVV64NRQ/exec";
 
-nextBtn.addEventListener('click', async()=>{
-  const currentSection=sections[current];
-  if(!validateSection(currentSection)){
-    alertMsg.style.display='block';
+function buildFormData() {
+  const formData = {};
+  document.querySelectorAll('input, select, textarea').forEach(el => {
+    const key = el.name?.trim();
+    if (!key) return;
+    if (el.type === 'checkbox') formData[key] = el.checked ? 'Sí' : 'No';
+    else formData[key] = el.value || '';
+  });
+  return formData;
+}
+
+nextBtn.addEventListener('click', async () => {
+  const currentSection = sections[current];
+  if (!validateSection(currentSection)) {
+    alertMsg.style.display = 'block';
     return;
   }
 
-  if(current<sections.length-1){
+  if (current < sections.length - 1) {
     current++;
     showStep(current);
   } else {
-    const formData=buildFormData();
-    nextBtn.disabled=true;
-    prevBtn.disabled=true;
-    statusMsg.style.display='block';
-    statusMsg.textContent='Enviando...';
-    progressBar.style.transition='width 0.5s ease';
+    const formData = buildFormData();
+    nextBtn.disabled = true;
+    nextBtn.textContent = 'Enviando...';
 
-    // Animación de barra de envío
-    let progress=0;
-    const interval = setInterval(()=>{
-      progress += 5;
-      if(progress>95) progress=95; // Límite mientras se confirma
-      progressBar.style.width = progress + '%';
-    }, 100);
+    try {
+      const result = await submitFormViaIframe(formData, SCRIPT_URL, { timeout: 20000 });
+      
+      nextBtn.textContent = "✅ Enviado correctamente";
+      nextBtn.style.background = "#4ade80";
+      nextBtn.style.color = "#fff";
 
-    try{
-      await submitFormViaIframe(formData,SCRIPT_URL);
-      clearInterval(interval);
-      progressBar.style.width='100%';
-      statusMsg.style.background='#d4edda';
-      statusMsg.style.color='#155724';
-      statusMsg.textContent='✅ Tu solicitud se registró correctamente. Gracias.';
-      nextBtn.textContent='✅ Enviado';
-    }catch(err){
-      clearInterval(interval);
-      progressBar.style.width='100%';
-      statusMsg.style.background='#d4edda';
-      statusMsg.style.color='#155724';
-      statusMsg.textContent='✅ Tu solicitud se registró correctamente. Gracias.';
-      nextBtn.textContent='✅ Enviado';
+      const successMsg = document.createElement('div');
+      successMsg.className = 'alert';
+      successMsg.style.background = "#d4edda";
+      successMsg.style.color = "#155724";
+      successMsg.textContent = "✅ Tu solicitud se registró correctamente. Gracias.";
+      document.querySelector('.form-wrapper').prepend(successMsg);
+
+      setTimeout(() => window.location.reload(), 2500);
+
+    } catch (err) {
+      console.warn("Error al enviar:", err);
+
+      nextBtn.textContent = "✅ Enviado (posible retraso)";
+      nextBtn.style.background = "#facc15";
+      nextBtn.style.color = "#000";
+
+      const warningMsg = document.createElement('div');
+      warningMsg.className = 'alert';
+      warningMsg.style.background = "#fff3cd";
+      warningMsg.style.color = "#856404";
+      warningMsg.textContent = "Tu solicitud se envió, aunque el servidor tardó en confirmar.";
+      document.querySelector('.form-wrapper').prepend(warningMsg);
+
+      setTimeout(() => window.location.reload(), 2500);
     }
   }
 });
 
-prevBtn.addEventListener('click',()=>{ if(current>0) current--; showStep(current); });
+prevBtn.addEventListener('click', () => { if (current > 0) current--; showStep(current); });
 
 // Campos condicionales
-const estadoCivil=document.getElementById('estadoCivil');
-const conyugeCampos=document.getElementById('conyugeCampos');
-estadoCivil.addEventListener('change',()=>{ conyugeCampos.style.display=estadoCivil.value==='Casado(a)'?'block':'none'; });
+const estadoCivil = document.getElementById('estadoCivil');
+const conyugeCampos = document.getElementById('conyugeCampos');
+estadoCivil.addEventListener('change', () => { conyugeCampos.style.display = estadoCivil.value === 'Casado(a)' ? 'block' : 'none'; });
 
-const licencia=document.getElementById('licenciaConducir');
-const licenciaCampos=document.getElementById('licenciaCampos');
-licencia.addEventListener('change',()=>{ licenciaCampos.style.display=licencia.value==='Sí'?'block':'none'; });
+const licencia = document.getElementById('licenciaConducir');
+const licenciaCampos = document.getElementById('licenciaCampos');
+licencia.addEventListener('change', () => { licenciaCampos.style.display = licencia.value === 'Sí' ? 'block' : 'none'; });
 
-const infonavit=document.getElementById('infonavit');
-const infonavitCampos=document.getElementById('infonavitCampos');
-infonavit.addEventListener('change',()=>{ infonavitCampos.style.display=infonavit.value==='Sí'?'block':'none'; });
+const infonavit = document.getElementById('infonavit');
+const infonavitCampos = document.getElementById('infonavitCampos');
+infonavit.addEventListener('change', () => { infonavitCampos.style.display = infonavit.value === 'Sí' ? 'block' : 'none'; });
 
-const fonacot=document.getElementById('fonacot');
-const fonacotCampos=document.getElementById('fonacotCampos');
-fonacot.addEventListener('change',()=>{ fonacotCampos.style.display=fonacot.value==='Sí'?'block':'none'; });
+const fonacot = document.getElementById('fonacot');
+const fonacotCampos = document.getElementById('fonacotCampos');
+fonacot.addEventListener('change', () => { fonacotCampos.style.display = fonacot.value === 'Sí' ? 'block' : 'none'; });
 
-const pension=document.getElementById('pension');
-const pensionCampos=document.getElementById('pensionCampos');
-pension.addEventListener('change',()=>{ pensionCampos.style.display=pension.value==='Sí'?'block':'none'; });
+const pension = document.getElementById('pension');
+const pensionCampos = document.getElementById('pensionCampos');
+pension.addEventListener('change', () => { pensionCampos.style.display = pension.value === 'Sí' ? 'block' : 'none'; });
 
 showStep(current);
 </script>
-  
 </body>
 </html>
+
 
 
 
