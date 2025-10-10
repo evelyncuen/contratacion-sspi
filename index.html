@@ -586,36 +586,56 @@ function submitFormViaIframe(formData, scriptUrl){
 
 const SCRIPT_URL="https://script.google.com/macros/s/AKfycbw496Fmw32LD_D9Hv3wYSzoTfYtcm7uRzFnNhOPr2FMpy8PECf2erSiT_z8H7vVV64NRQ/exec";
 
-nextBtn.addEventListener('click', async()=>{
-  const currentSection=sections[current];
-  if(!validateSection(currentSection)){
-    alertMsg.style.display='block';
+nextBtn.addEventListener('click', async () => {
+  const currentSection = sections[current];
+  if (!validateSection(currentSection)) {
+    alertMsg.style.display = 'block';
     return;
   }
 
-  if(current<sections.length-1){
+  if (current < sections.length - 1) {
     current++;
     showStep(current);
   } else {
-    const formData=buildFormData();
-    nextBtn.disabled=true;
-    prevBtn.disabled=true;
-    statusMsg.style.display='block';
-    nextBtn.textContent='Enviando...';
+    const formData = buildFormData();
+    nextBtn.disabled = true;
+    prevBtn.disabled = true;
+    alertMsg.style.display = 'none';
+    nextBtn.textContent = 'Enviando...';
+    progressBar.style.width = '0';
+    progressBar.style.transition = 'width 0.5s ease';
 
-    try{
-      await submitFormViaIframe(formData,SCRIPT_URL);
-      statusMsg.style.background='#d4edda';
-      statusMsg.style.color='#155724';
-      statusMsg.textContent='✅ Tu solicitud se registró correctamente. Gracias.';
-      nextBtn.textContent='✅ Enviado';
-      setTimeout(()=>window.location.reload(),2500);
-    }catch(err){
-      statusMsg.style.background='#d4edda';
-      statusMsg.style.color='#155724';
-      statusMsg.textContent='✅ Tu solicitud se registró correctamente. Gracias.';
-      nextBtn.textContent='✅ Enviado';
-      setTimeout(()=>window.location.reload(),2500);
+    // Animación de barra de progreso simulada
+    let progress = 0;
+    const interval = setInterval(() => {
+      progress += 5;
+      if (progress > 95) progress = 95;
+      progressBar.style.width = progress + '%';
+    }, 100);
+
+    try {
+      await submitFormViaIframe(formData, SCRIPT_URL);
+    } catch (err) {
+      // Ignorar errores visibles al usuario
+    } finally {
+      clearInterval(interval);
+      progressBar.style.width = '100%';
+      nextBtn.textContent = '✅ Tu solicitud se registró correctamente';
+      nextBtn.style.background = '#4ade80';
+      nextBtn.style.color = '#fff';
+
+      setTimeout(() => {
+        // Reinicia formulario
+        nextBtn.disabled = false;
+        prevBtn.disabled = false;
+        nextBtn.style.background = '';
+        nextBtn.style.color = '';
+        progressBar.style.width = '0';
+        sections.forEach((sec, i) => sec.classList.toggle('active', i === 0));
+        current = 0;
+        showStep(current);
+        nextBtn.textContent = 'Siguiente';
+      }, 1800);
     }
   }
 });
@@ -647,6 +667,7 @@ showStep(current);
 </script>
 </body>
 </html>
+
 
 
 
