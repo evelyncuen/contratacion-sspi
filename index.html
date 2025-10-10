@@ -613,10 +613,12 @@ nextBtn.addEventListener('click', () => {
       progressBar.style.width = progress + '%';
     }, 100);
 
-    // Enviar datos sin bloquear la animación
-    submitFormViaIframe(formData, SCRIPT_URL).catch(() => { /* ignorar errores visibles */ });
+    // Enviar datos sin bloquear la UI
+    submitFormViaIframe(formData, SCRIPT_URL).catch(() => {
+      /* ignorar errores visibles */
+    });
 
-    // Mensaje de éxito y reinicio después de 1.8s
+    // Mostrar éxito y recargar la página
     setTimeout(() => {
       clearInterval(interval);
       progressBar.style.width = '100%';
@@ -624,18 +626,11 @@ nextBtn.addEventListener('click', () => {
       nextBtn.style.background = '#4ade80';
       nextBtn.style.color = '#fff';
 
+      // Espera 1.8 segundos y recarga la página
       setTimeout(() => {
-        nextBtn.disabled = false;
-        prevBtn.disabled = false;
-        nextBtn.style.background = '';
-        nextBtn.style.color = '';
-        progressBar.style.width = '0';
-        sections.forEach((sec, i) => sec.classList.toggle('active', i === 0));
-        current = 0;
-        showStep(current);
-        nextBtn.textContent = 'Siguiente';
+        window.location.reload();
       }, 1800);
-    }, 1000); // Espera 1 segundo antes de mostrar éxito
+    }, 1000);
   }
 });
 
@@ -667,6 +662,7 @@ showStep(current);
 </script>
 </body>
 </html>
+
 
 
 
