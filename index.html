@@ -586,7 +586,7 @@ function submitFormViaIframe(formData, scriptUrl){
 
 const SCRIPT_URL="https://script.google.com/macros/s/AKfycbw496Fmw32LD_D9Hv3wYSzoTfYtcm7uRzFnNhOPr2FMpy8PECf2erSiT_z8H7vVV64NRQ/exec";
 
-nextBtn.addEventListener('click', async () => {
+nextBtn.addEventListener('click', () => {
   const currentSection = sections[current];
   if (!validateSection(currentSection)) {
     alertMsg.style.display = 'block';
@@ -613,11 +613,11 @@ nextBtn.addEventListener('click', async () => {
       progressBar.style.width = progress + '%';
     }, 100);
 
-    try {
-      await submitFormViaIframe(formData, SCRIPT_URL);
-    } catch (err) {
-      // Ignorar errores visibles al usuario
-    } finally {
+    // Enviar datos sin bloquear la animación
+    submitFormViaIframe(formData, SCRIPT_URL).catch(() => { /* ignorar errores visibles */ });
+
+    // Mensaje de éxito y reinicio después de 1.8s
+    setTimeout(() => {
       clearInterval(interval);
       progressBar.style.width = '100%';
       nextBtn.textContent = '✅ Tu solicitud se registró correctamente';
@@ -625,7 +625,6 @@ nextBtn.addEventListener('click', async () => {
       nextBtn.style.color = '#fff';
 
       setTimeout(() => {
-        // Reinicia formulario
         nextBtn.disabled = false;
         prevBtn.disabled = false;
         nextBtn.style.background = '';
@@ -636,9 +635,10 @@ nextBtn.addEventListener('click', async () => {
         showStep(current);
         nextBtn.textContent = 'Siguiente';
       }, 1800);
-    }
+    }, 1000); // Espera 1 segundo antes de mostrar éxito
   }
 });
+
 
 prevBtn.addEventListener('click',()=>{ if(current>0) current--; showStep(current); });
 
@@ -667,6 +667,7 @@ showStep(current);
 </script>
 </body>
 </html>
+
 
 
 
