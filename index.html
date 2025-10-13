@@ -465,6 +465,17 @@
 
     <!-- PASO 7 -->
     <section>
+      <h2>Último Empleo</h2>
+      <label class="required">Empresa</label>
+      <input type="text" name="EmpresaUltimoEmpleo" required>
+      <label class="required">Puesto</label>
+      <input type="text" name="PuestoUltimoEmpleo" required>
+      <label>Actividades Realizadas</label>
+      <textarea rows="3" name="ActividadesUltimoEmpleo" placeholder="Describe brevemente tus principales funciones..."></textarea>
+    </section>
+
+    <!-- PASO 8 -->
+    <section>
       <h2>Referencias Personales</h2>
       <h3>Referencia 1</h3>
       <label class="required">Nombre Completo</label>
@@ -479,7 +490,7 @@
       <input type="tel" name="Referencia2Telefono" required>
     </section>
 
-    <!-- PASO 8 -->
+    <!-- PASO 9 -->
     <section>
       <h2>Declaración</h2>
       <div class="checkbox">
@@ -509,159 +520,83 @@ const nextBtn = document.getElementById('nextBtn');
 const prevBtn = document.getElementById('prevBtn');
 const progressBar = document.getElementById('progressBar');
 const alertMsg = document.getElementById('alertMsg');
-const statusMsg = document.getElementById('statusMsg');
 let current = 0;
 
-function showStep(index) {
+function showStep(index){
   sections.forEach((sec,i)=>sec.classList.toggle('active',i===index));
-  prevBtn.disabled = index===0;
-  nextBtn.textContent = index===sections.length-1?'Enviar':'Siguiente';
+  prevBtn.disabled=index===0;
+  nextBtn.textContent=index===sections.length-1?'Enviar':'Siguiente';
   progressBar.style.width=((index+1)/sections.length)*100+'%';
   alertMsg.style.display='none';
 }
 
-// Validación
 function validateSection(section){
-  const requiredFields = section.querySelectorAll('[required]');
-  for(const field of requiredFields){
-    if((field.type==='checkbox'&&!field.checked)||(!field.value||!field.value.toString().trim())){
-      field.focus();
-      return false;
-    }
+  const requiredFields=section.querySelectorAll('[required]');
+  for(const f of requiredFields){
+    if((f.type==='checkbox'&&!f.checked)||(!f.value||!f.value.trim())){f.focus();return false;}
   }
   return true;
 }
 
-// Construye formData
 function buildFormData(){
-  const formData={};
-  document.querySelectorAll('input, select, textarea').forEach(el=>{
-    const key = el.name?.trim();
-    if(!key) return;
-    formData[key] = el.type==='checkbox'? (el.checked?'Sí':'No') : (el.value||'');
+  const data={};
+  document.querySelectorAll('input,select,textarea').forEach(el=>{
+    const key=el.name?.trim(); if(!key)return;
+    data[key]=el.type==='checkbox'?(el.checked?'Sí':'No'):(el.value||'');
   });
-  return formData;
+  return data;
 }
 
-// Envío mediante iframe
-function submitFormViaIframe(formData, scriptUrl){
+function submitFormViaIframe(formData,url){
   return new Promise((resolve,reject)=>{
-    let iframe = document.getElementById('gs-target-iframe');
+    let iframe=document.getElementById('gs-target-iframe');
     if(!iframe){
       iframe=document.createElement('iframe');
-      iframe.id='gs-target-iframe';
-      iframe.name='gs-target-iframe';
-      iframe.style.display='none';
-      document.body.appendChild(iframe);
+      iframe.id='gs-target-iframe';iframe.name='gs-target-iframe';
+      iframe.style.display='none';document.body.appendChild(iframe);
     }
-
-    function onMessage(e){
-      window.removeEventListener('message',onMessage);
-      try{
-        if(e.data && e.data.result==='success') resolve({ok:true});
-        else reject();
-      }catch(err){ reject(err); }
+    function onMsg(e){window.removeEventListener('message',onMsg);
+      try{if(e.data&&e.data.result==='success')resolve({ok:true});else reject();}catch(err){reject(err);}
     }
-    window.addEventListener('message',onMessage);
-
-    const form = document.createElement('form');
-    form.style.display='none';
-    form.method='POST';
-    form.action=scriptUrl;
-    form.target=iframe.name;
-
-    Object.keys(formData).forEach(key=>{
-      const input=document.createElement('input');
-      input.type='hidden';
-      input.name=key;
-      input.value=formData[key]??'';
-      form.appendChild(input);
-    });
-
-    document.body.appendChild(form);
-    form.submit();
-    setTimeout(()=>{ try{ form.remove(); }catch(e){} }, 2000);
+    window.addEventListener('message',onMsg);
+    const form=document.createElement('form');form.style.display='none';
+    form.method='POST';form.action=url;form.target=iframe.name;
+    for(const k in formData){
+      const i=document.createElement('input');i.type='hidden';i.name=k;i.value=formData[k];form.appendChild(i);
+    }
+    document.body.appendChild(form);form.submit();setTimeout(()=>form.remove(),2000);
   });
 }
 
 const SCRIPT_URL="https://script.google.com/macros/s/AKfycbw496Fmw32LD_D9Hv3wYSzoTfYtcm7uRzFnNhOPr2FMpy8PECf2erSiT_z8H7vVV64NRQ/exec";
 
-nextBtn.addEventListener('click', () => {
-  const currentSection = sections[current];
-  if (!validateSection(currentSection)) {
-    alertMsg.style.display = 'block';
-    return;
-  }
-
-  if (current < sections.length - 1) {
-    current++;
-    showStep(current);
-  } else {
-    const formData = buildFormData();
-    nextBtn.disabled = true;
-    prevBtn.disabled = true;
-    alertMsg.style.display = 'none';
-    nextBtn.textContent = 'Enviando...';
-    progressBar.style.width = '0';
-    progressBar.style.transition = 'width 0.5s ease';
-
-    // Animación de barra de progreso simulada
-    let progress = 0;
-    const interval = setInterval(() => {
-      progress += 5;
-      if (progress > 95) progress = 95;
-      progressBar.style.width = progress + '%';
-    }, 100);
-
-    // Enviar datos sin bloquear la UI
-    submitFormViaIframe(formData, SCRIPT_URL).catch(() => {
-      /* ignorar errores visibles */
-    });
-
-    // Mostrar éxito y recargar la página
-    setTimeout(() => {
+nextBtn.addEventListener('click',()=>{
+  const sec=sections[current];
+  if(!validateSection(sec)){alertMsg.style.display='block';return;}
+  if(current<sections.length-1){current++;showStep(current);}
+  else{
+    const formData=buildFormData();
+    nextBtn.disabled=true;prevBtn.disabled=true;alertMsg.style.display='none';
+    nextBtn.textContent='Enviando...';
+    progressBar.style.width='0';let p=0;
+    const interval=setInterval(()=>{p+=5;if(p>95)p=95;progressBar.style.width=p+'%';},100);
+    submitFormViaIframe(formData,SCRIPT_URL).catch(()=>{});
+    setTimeout(()=>{
       clearInterval(interval);
-      progressBar.style.width = '100%';
-      nextBtn.textContent = '✅ Tu solicitud se registró correctamente';
-      nextBtn.style.background = '#4ade80';
-      nextBtn.style.color = '#fff';
-
-      // Espera 1.8 segundos y recarga la página
-      setTimeout(() => {
-        window.location.reload();
-      }, 1800);
-    }, 1000);
+      progressBar.style.width='100%';
+      nextBtn.textContent='✅ Tu solicitud se registró correctamente';
+      nextBtn.style.background='#4ade80';nextBtn.style.color='#fff';
+      setTimeout(()=>window.location.reload(),1800);
+    },1000);
   }
 });
 
-
-prevBtn.addEventListener('click',()=>{ if(current>0) current--; showStep(current); });
-
-// Campos condicionales
-const estadoCivil=document.getElementById('estadoCivil');
-const conyugeCampos=document.getElementById('conyugeCampos');
-estadoCivil.addEventListener('change',()=>{ conyugeCampos.style.display=estadoCivil.value==='Casado(a)'?'block':'none'; });
-
-const licencia=document.getElementById('licenciaConducir');
-const licenciaCampos=document.getElementById('licenciaCampos');
-licencia.addEventListener('change',()=>{ licenciaCampos.style.display=licencia.value==='Sí'?'block':'none'; });
-
-const infonavit=document.getElementById('infonavit');
-const infonavitCampos=document.getElementById('infonavitCampos');
-infonavit.addEventListener('change',()=>{ infonavitCampos.style.display=infonavit.value==='Sí'?'block':'none'; });
-
-const fonacot=document.getElementById('fonacot');
-const fonacotCampos=document.getElementById('fonacotCampos');
-fonacot.addEventListener('change',()=>{ fonacotCampos.style.display=fonacot.value==='Sí'?'block':'none'; });
-
-const pension=document.getElementById('pension');
-const pensionCampos=document.getElementById('pensionCampos');
-pension.addEventListener('change',()=>{ pensionCampos.style.display=pension.value==='Sí'?'block':'none'; });
-
+prevBtn.addEventListener('click',()=>{if(current>0)current--;showStep(current);});
 showStep(current);
 </script>
 </body>
 </html>
+
 
 
 
