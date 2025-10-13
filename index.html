@@ -197,6 +197,73 @@
       box-shadow: 3px 3px 6px #ccc;
       font-weight: 500;
     }
+    /* === Estilos Responsivos === */
+@media (max-width: 768px) {
+  body {
+    padding: 20px;
+  }
+
+  .form-wrapper {
+    padding: 25px 20px;
+    border-radius: 20px;
+  }
+
+  .logo-container img {
+    width: 140px;
+  }
+
+  h1 {
+    font-size: 1.4rem;
+    line-height: 1.2;
+    word-wrap: break-word;
+    margin-bottom: 10px;
+  }
+
+  p {
+    font-size: 0.95rem;
+    margin-bottom: 20px;
+  }
+
+  .row {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .row .half {
+    width: 100%;
+  }
+
+  input, textarea, select {
+    font-size: 1rem;
+    padding: 12px;
+  }
+
+  .button-group {
+    flex-direction: column;
+    gap: 12px;
+    align-items: stretch;
+  }
+
+  button {
+    width: 100%;
+    font-size: 1rem;
+    padding: 14px;
+  }
+
+  .alert {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 400px) {
+  h1 {
+    font-size: 1.2rem;
+  }
+  .logo-container img {
+    width: 120px;
+  }
+}
+
   </style>
 </head>
 <body>
@@ -596,6 +663,7 @@ showStep(current);
 </script>
 </body>
 </html>
+
 
 
 
