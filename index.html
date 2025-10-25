@@ -1,673 +1,906 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Formulario de Contratación SSPI</title>
-  <style>
-    :root {
-      --bg: #e6e9f0;
-      --shadow-light: #ffffff;
-      --shadow-dark: #b8b9be;
-      --primary: #5b4bff;
-      --text: #333;
-      --required: #d90429;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulario de Contratación - SSPI Grupo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #e6e9f0;
+            --shadow-light: #ffffff;
+            --shadow-dark: #b8b9be;
+            --primary: #5b4bff;
+            --text: #333;
+            --required: #d90429;
+        }
 
-    * {
-      box-sizing: border-box;
-      font-family: 'Poppins', sans-serif;
-    }
+        * {
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
 
-    body {
-      background: var(--bg);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      padding: 40px;
-    }
+        body {
+            background: var(--bg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 40px;
+        }
 
-    .form-wrapper {
-      width: 100%;
-      max-width: 950px;
-      background: var(--bg);
-      border-radius: 25px;
-      box-shadow: 12px 12px 24px var(--shadow-dark),
-                  -12px -12px 24px var(--shadow-light);
-      padding: 40px 50px;
-      position: relative;
-    }
+        .form-wrapper {
+            width: 100%;
+            max-width: 950px;
+            background: var(--bg);
+            border-radius: 25px;
+            box-shadow: 12px 12px 24px var(--shadow-dark),
+                        -12px -12px 24px var(--shadow-light);
+            padding: 40px 50px;
+            position: relative;
+        }
 
-    .logo-container {
-      text-align: center;
-      margin-bottom: 20px;
-    }
+        .logo-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
 
-    .logo-container img {
-      width: 180px;
-      height: auto;
-      filter: drop-shadow(2px 2px 4px #bbb);
-    }
+        .logo-container img {
+            width: 180px;
+            height: auto;
+            filter: drop-shadow(2px 2px 4px #bbb);
+        }
 
-    h1 {
-      text-align: center;
-      color: var(--text);
-      margin-bottom: 5px;
-    }
+        h1 {
+            text-align: center;
+            color: var(--text);
+            margin-bottom: 5px;
+            font-size: 1.8rem;
+        }
 
-    p {
-      text-align: center;
-      color: #666;
-      margin-bottom: 30px;
-    }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 0.95rem;
+        }
 
-    .progress {
-      width: 100%;
-      height: 8px;
-      border-radius: 10px;
-      background: #d1d1d6;
-      margin-bottom: 30px;
-      position: relative;
-    }
+        .progress {
+            width: 100%;
+            height: 8px;
+            border-radius: 10px;
+            background: #d1d1d6;
+            margin-bottom: 30px;
+            position: relative;
+        }
 
-    .progress-bar {
-      position: absolute;
-      height: 8px;
-      border-radius: 10px;
-      background: var(--primary);
-      width: 12.5%;
-      transition: width 0.4s ease;
-    }
+        .progress-bar {
+            position: absolute;
+            height: 8px;
+            border-radius: 10px;
+            background: var(--primary);
+            width: 12.5%;
+            transition: width 0.4s ease;
+        }
 
-    section {
-      display: none;
-      animation: fade 0.4s ease;
-    }
+        section {
+            display: none;
+            animation: fade 0.4s ease;
+        }
 
-    section.active {
-      display: block;
-    }
+        section.active {
+            display: block;
+        }
 
-    @keyframes fade {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+        @keyframes fade {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-    h2 {
-      color: var(--text);
-      margin-bottom: 20px;
-    }
+        h2 {
+            color: var(--text);
+            margin-bottom: 20px;
+            font-size: 1.4rem;
+        }
 
-    label {
-      display: block;
-      margin-bottom: 6px;
-      font-weight: 500;
-    }
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
 
-    label.required::after {
-      content: " *";
-      color: var(--required);
-    }
+        label.required::after {
+            content: " *";
+            color: var(--required);
+        }
 
-    input, textarea, select {
-      width: 100%;
-      padding: 12px 15px;
-      border: none;
-      border-radius: 12px;
-      background: var(--bg);
-      box-shadow: inset 5px 5px 10px var(--shadow-dark),
-                  inset -5px -5px 10px var(--shadow-light);
-      font-size: 15px;
-      color: var(--text);
-      margin-bottom: 20px;
-    }
+        input, textarea, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: none;
+            border-radius: 12px;
+            background: var(--bg);
+            box-shadow: inset 5px 5px 10px var(--shadow-dark),
+                        inset -5px -5px 10px var(--shadow-light);
+            font-size: 15px;
+            color: var(--text);
+            margin-bottom: 20px;
+        }
 
-    input:focus, textarea:focus, select:focus {
-      outline: none;
-      box-shadow: inset 3px 3px 6px var(--shadow-dark),
-                  inset -3px -3px 6px var(--shadow-light);
-    }
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            box-shadow: inset 3px 3px 6px var(--shadow-dark),
+                        inset -3px -3px 6px var(--shadow-light);
+        }
 
-    .row {
-      display: flex;
-      gap: 20px;
-    }
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
 
-    .row .half {
-      flex: 1;
-    }
+        .row {
+            display: flex;
+            gap: 20px;
+        }
 
-    .conditional {
-      display: none;
-      padding-left: 10px;
-      margin-top: -10px;
-    }
+        .row .half {
+            flex: 1;
+        }
 
-    .button-group {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 30px;
-    }
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
 
-    button {
-      padding: 12px 30px;
-      border-radius: 12px;
-      border: none;
-      background: var(--bg);
-      color: var(--primary);
-      font-weight: 600;
-      cursor: pointer;
-      box-shadow: 5px 5px 10px var(--shadow-dark),
-                  -5px -5px 10px var(--shadow-light);
-      transition: all 0.2s ease;
-    }
+        button {
+            padding: 12px 30px;
+            border-radius: 12px;
+            border: none;
+            background: var(--bg);
+            color: var(--primary);
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 5px 5px 10px var(--shadow-dark),
+                        -5px -5px 10px var(--shadow-light);
+            transition: all 0.2s ease;
+        }
 
-    button:hover {
-      box-shadow: inset 5px 5px 10px var(--shadow-dark),
-                  inset -5px -5px 10px var(--shadow-light);
-    }
+        button:hover {
+            box-shadow: inset 5px 5px 10px var(--shadow-dark),
+                        inset -5px -5px 10px var(--shadow-light);
+        }
 
-    button:disabled {
-      opacity: 0.4;
-      cursor: not-allowed;
-    }
+        button:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
 
-    .checkbox {
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-      margin-bottom: 15px;
-    }
+        .checkbox {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
 
-    .checkbox input {
-      width: 20px;
-      height: 20px;
-      margin-top: 3px;
-    }
+        .checkbox input {
+            width: 20px;
+            height: 20px;
+            margin-top: 3px;
+            margin-bottom: 0;
+        }
 
-    .alert {
-      text-align: center;
-      background: #ffd7d7;
-      color: #a30000;
-      padding: 10px 15px;
-      border-radius: 10px;
-      margin-bottom: 20px;
-      display: none;
-      box-shadow: 3px 3px 6px #ccc;
-      font-weight: 500;
-    }
-    /* === Estilos Responsivos === */
-@media (max-width: 768px) {
-  body {
-    padding: 20px;
-  }
+        .checkbox label {
+            margin: 0;
+            font-size: 0.9rem;
+        }
 
-  .form-wrapper {
-    padding: 25px 20px;
-    border-radius: 20px;
-  }
+        .alert {
+            text-align: center;
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+            box-shadow: 3px 3px 6px #ccc;
+            font-weight: 500;
+        }
 
-  .logo-container img {
-    width: 140px;
-  }
+        .alert.error {
+            background: #ffd7d7;
+            color: #a30000;
+        }
 
-  h1 {
-    font-size: 1.4rem;
-    line-height: 1.2;
-    word-wrap: break-word;
-    margin-bottom: 10px;
-  }
+        @media (max-width: 768px) {
+            body {
+                padding: 20px;
+            }
 
-  p {
-    font-size: 0.95rem;
-    margin-bottom: 20px;
-  }
+            .form-wrapper {
+                padding: 25px 20px;
+                border-radius: 20px;
+            }
 
-  .row {
-    flex-direction: column;
-    gap: 0;
-  }
+            .logo-container img {
+                width: 140px;
+            }
 
-  .row .half {
-    width: 100%;
-  }
+            h1 {
+                font-size: 1.4rem;
+                line-height: 1.2;
+                word-wrap: break-word;
+                margin-bottom: 10px;
+            }
 
-  input, textarea, select {
-    font-size: 1rem;
-    padding: 12px;
-  }
+            .subtitle {
+                font-size: 0.95rem;
+                margin-bottom: 20px;
+            }
 
-  .button-group {
-    flex-direction: column;
-    gap: 12px;
-    align-items: stretch;
-  }
+            .row {
+                flex-direction: column;
+                gap: 0;
+            }
 
-  button {
-    width: 100%;
-    font-size: 1rem;
-    padding: 14px;
-  }
+            .row .half {
+                width: 100%;
+            }
 
-  .alert {
-    font-size: 0.9rem;
-  }
-}
+            input, textarea, select {
+                font-size: 1rem;
+                padding: 12px;
+            }
 
-@media (max-width: 400px) {
-  h1 {
-    font-size: 1.2rem;
-  }
-  .logo-container img {
-    width: 120px;
-  }
-}
+            .button-group {
+                flex-direction: column;
+                gap: 12px;
+                align-items: stretch;
+            }
 
-  </style>
+            button {
+                width: 100%;
+                font-size: 1rem;
+                padding: 14px;
+            }
+
+            .alert {
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 400px) {
+            h1 {
+                font-size: 1.2rem;
+            }
+            .logo-container img {
+                width: 120px;
+            }
+        }
+    </style>
 </head>
 <body>
+    <div class="form-wrapper">
+        <div class="logo-container">
+            <!-- Reemplaza TU_LOGO_URL con la URL de tu logo PNG -->
+            <img src="LOGO GRUPO NEGRO.png" alt="SSPI Grupo Logo">
+        </div>
+        
+        <h1>Formulario de Contratación</h1>
+        <p class="subtitle">Complete los siguientes pasos para aplicar.</p>
+        
+        <div class="progress">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
 
-  <form class="form-wrapper" id="multiForm" novalidate>
-    <div class="logo-container">
-      <img src="LOGO GRUPO NEGRO.png" alt="Logo SSPI">
+        <div class="alert" id="alertMessage"></div>
+        
+        <form id="solicitudForm">
+            <!-- PASO 1: DATOS PERSONALES -->
+            <section class="active" data-step="1">
+                <h2>Datos Personales</h2>
+                <div class="row">
+                    <div class="half">
+                        <label class="required">Nombre(s)</label>
+                        <input type="text" name="Nombre" required>
+                    </div>
+                    <div class="half">
+                        <label class="required">Apellido Paterno</label>
+                        <input type="text" name="ApellidoPaterno" required>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="half">
+                        <label>Apellido Materno</label>
+                        <input type="text" name="ApellidoMaterno">
+                    </div>
+                    <div class="half">
+                        <label class="required">Teléfono</label>
+                        <input type="tel" name="Telefono" placeholder="55-1234-5678" required>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="half">
+                        <label class="required">Correo Electrónico</label>
+                        <input type="email" name="Email" placeholder="ejemplo@correo.com" required>
+                    </div>
+                    <div class="half">
+                        <label class="required">CURP</label>
+                        <input type="text" name="CURP" maxlength="18" required>
+                    </div>
+                </div>
+                
+                <label class="required">Dirección Completa</label>
+                <textarea name="Direccion" required></textarea>
+            </section>
+
+            <!-- PASO 2: INFORMACIÓN GENERAL -->
+            <section data-step="2">
+                <h2>Información General</h2>
+                <div class="row">
+                    <div class="half">
+                        <label class="required">Fecha de Nacimiento</label>
+                        <input type="date" name="FechaNacimiento" required>
+                    </div>
+                    <div class="half">
+                        <label class="required">Estado Civil</label>
+                        <select name="EstadoCivil" required>
+                            <option value="">Seleccione...</option>
+                            <option value="Soltero/a">Soltero/a</option>
+                            <option value="Casado/a">Casado/a</option>
+                            <option value="Divorciado/a">Divorciado/a</option>
+                            <option value="Viudo/a">Viudo/a</option>
+                            <option value="Unión Libre">Unión Libre</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="half">
+                        <label>Nombre del Cónyuge</label>
+                        <input type="text" name="NombreConyuge">
+                    </div>
+                    <div class="half">
+                        <label>Ocupación del Cónyuge</label>
+                        <input type="text" name="OcupacionConyuge">
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="half">
+                        <label>RFC</label>
+                        <input type="text" name="RFC" maxlength="13">
+                    </div>
+                    <div class="half">
+                        <label class="required">Nacionalidad</label>
+                        <input type="text" name="Nacionalidad" value="Mexicana" required>
+                    </div>
+                </div>
+                
+                <label class="required">Lugar de Nacimiento</label>
+                <input type="text" name="LugarNacimiento" placeholder="Ciudad, Estado" required>
+                
+                <div class="row">
+                    <div class="half">
+                        <label>¿Cuenta con licencia para conducir?</label>
+                        <select name="LicenciaConducir">
+                            <option value="No">No</option>
+                            <option value="Sí">Sí</option>
+                        </select>
+                    </div>
+                    <div class="half">
+                        <label>Clase de Licencia</label>
+                        <input type="text" name="ClaseLicencia">
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="half">
+                        <label>Número de Licencia</label>
+                        <input type="text" name="NumeroLicencia">
+                    </div>
+                    <div class="half">
+                        <label>¿Maneja Estándar?</label>
+                        <select name="ManejaEstandar">
+                            <option value="No">No</option>
+                            <option value="Sí">Sí</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="half">
+                        <label>¿Cuenta con cartilla militar?</label>
+                        <select name="CartillaMilitar">
+                            <option value="No">No</option>
+                            <option value="Sí">Sí</option>
+                        </select>
+                    </div>
+                    <div class="half">
+                        <label>¿Cuenta con visa láser vigente?</label>
+                        <select name="VisaLaser">
+                            <option value="No">No</option>
+                            <option value="Sí">Sí</option>
+                        </select>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PASO 3: INFORMACIÓN ECONÓMICA -->
+            <section data-step="3">
+                <h2>Información Económica</h2>
+                <label>¿Cuenta con crédito INFONAVIT?</label>
+                <select name="CreditoINFONAVIT">
+                    <option value="No">No</option>
+                    <option value="Sí">Sí</option>
+                </select>
+                
+                <div class="row">
+                    <div class="half">
+                        <label>Número INFONAVIT</label>
+                        <input type="text" name="NumeroInfonavit">
+                    </div>
+                    <div class="half">
+                        <label>Pago INFONAVIT</label>
+                        <input type="text" name="PagoInfonavit" placeholder="$0.00">
+                    </div>
+                </div>
+                
+                <label>¿Cuenta con crédito FONACOT?</label>
+                <select name="CreditoFONACOT">
+                    <option value="No">No</option>
+                    <option value="Sí">Sí</option>
+                </select>
+                
+                <div class="row">
+                    <div class="half">
+                        <label>Número FONACOT</label>
+                        <input type="text" name="NumeroFonacot">
+                    </div>
+                    <div class="half">
+                        <label>Pago FONACOT</label>
+                        <input type="text" name="PagoFonacot" placeholder="$0.00">
+                    </div>
+                </div>
+                
+                <label>¿Tiene pensión alimenticia?</label>
+                <select name="PensionAlimenticia">
+                    <option value="No">No</option>
+                    <option value="Sí">Sí</option>
+                </select>
+                
+                <label>Cantidad de Pensión</label>
+                <input type="text" name="CantidadPension" placeholder="$0.00">
+            </section>
+
+            <!-- PASO 4: ESTADO DE SALUD -->
+            <section data-step="4">
+                <h2>Estado de Salud</h2>
+                <div class="row">
+                    <div class="half">
+                        <label class="required">Tipo de Sangre</label>
+                        <select name="TipoSangre" required>
+                            <option value="">Seleccione...</option>
+                            <option value="A+">A+</option>
+                            <option value="A-">A-</option>
+                            <option value="B+">B+</option>
+                            <option value="B-">B-</option>
+                            <option value="AB+">AB+</option>
+                            <option value="AB-">AB-</option>
+                            <option value="O+">O+</option>
+                            <option value="O-">O-</option>
+                        </select>
+                    </div>
+                    <div class="half">
+                        <label class="required">NSS</label>
+                        <input type="text" name="NSS" maxlength="11" required>
+                    </div>
+                </div>
+                
+                <label>Enfermedad o condición médica</label>
+                <input type="text" name="Enfermedad" placeholder="Ninguna">
+                
+                <label>Alergias</label>
+                <input type="text" name="Alergias" placeholder="Ninguna">
+                
+                <label>Medicamento Regular</label>
+                <input type="text" name="Medicamento" placeholder="Ninguno">
+            </section>
+
+            <!-- PASO 5: CONTACTO DE EMERGENCIA -->
+            <section data-step="5">
+                <h2>Contacto de Emergencia</h2>
+                <label class="required">Nombre Completo</label>
+                <input type="text" name="ContactoNombre" required>
+                
+                <label class="required">Parentesco</label>
+                <input type="text" name="ContactoParentesco" required>
+                
+                <label class="required">Dirección</label>
+                <input type="text" name="ContactoDireccion" required>
+                
+                <label class="required">Teléfono</label>
+                <input type="tel" name="ContactoTelefono" required>
+            </section>
+
+            <!-- PASO 6: ESCOLARIDAD -->
+            <section data-step="6">
+                <h2>Escolaridad</h2>
+                <div class="row">
+                    <div class="half">
+                        <label class="required">Nivel Educativo</label>
+                        <select name="NivelEducativo" required>
+                            <option value="">Seleccione...</option>
+                            <option value="Primaria">Primaria</option>
+                            <option value="Secundaria">Secundaria</option>
+                            <option value="Preparatoria">Preparatoria</option>
+                            <option value="Técnico">Técnico</option>
+                            <option value="Licenciatura">Licenciatura</option>
+                            <option value="Maestría">Maestría</option>
+                            <option value="Doctorado">Doctorado</option>
+                        </select>
+                    </div>
+                    <div class="half">
+                        <label class="required">Estatus</label>
+                        <select name="EstatusEscolar" required>
+                            <option value="">Seleccione...</option>
+                            <option value="Completo">Completo</option>
+                            <option value="Incompleto">Incompleto</option>
+                            <option value="En curso">En curso</option>
+                            <option value="Trunco">Trunco</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <label>Certificaciones o Cursos</label>
+                <textarea name="Certificaciones"></textarea>
+                
+                <div class="row">
+                    <div class="half">
+                        <label class="required">Inglés Hablado</label>
+                        <select name="InglesHablado" required>
+                            <option value="">Seleccione...</option>
+                            <option value="Nulo">Nulo</option>
+                            <option value="Básico">Básico</option>
+                            <option value="Intermedio">Intermedio</option>
+                            <option value="Avanzado">Avanzado</option>
+                            <option value="Fluido">Fluido</option>
+                        </select>
+                    </div>
+                    <div class="half">
+                        <label class="required">Inglés Escrito</label>
+                        <select name="InglesEscrito" required>
+                            <option value="">Seleccione...</option>
+                            <option value="Nulo">Nulo</option>
+                            <option value="Básico">Básico</option>
+                            <option value="Intermedio">Intermedio</option>
+                            <option value="Avanzado">Avanzado</option>
+                            <option value="Fluido">Fluido</option>
+                        </select>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PASO 7: ÚLTIMO EMPLEO -->
+            <section data-step="7">
+                <h2>Último Empleo</h2>
+                <label>Empresa</label>
+                <input type="text" name="EmpresaUltimoEmpleo">
+                
+                <label>Puesto</label>
+                <input type="text" name="PuestoUltimoEmpleo">
+                
+                <label>Actividades Realizadas</label>
+                <textarea name="ActividadesUltimoEmpleo" placeholder="Describe brevemente tus principales funciones..."></textarea>
+            </section>
+
+            <!-- PASO 8: REFERENCIAS PERSONALES -->
+            <section data-step="8">
+                <h2>Referencias Personales</h2>
+                <h3 style="margin-bottom: 15px; font-size: 1.1rem;">Referencia 1</h3>
+                <label class="required">Nombre Completo</label>
+                <input type="text" name="Referencia1Nombre" required>
+                
+                <label class="required">Teléfono</label>
+                <input type="tel" name="Referencia1Telefono" required>
+                
+                <h3 style="margin: 25px 0 15px 0; font-size: 1.1rem;">Referencia 2</h3>
+                <label class="required">Nombre Completo</label>
+                <input type="text" name="Referencia2Nombre" required>
+                
+                <label class="required">Teléfono</label>
+                <input type="tel" name="Referencia2Telefono" required>
+            </section>
+
+            <!-- PASO 9: DECLARACIÓN -->
+            <section data-step="9">
+                <h2>Declaración</h2>
+                <div class="checkbox">
+                    <input type="checkbox" name="DeclaracionVeracidad" id="decl1" value="Acepto" required>
+                    <label for="decl1">Hago constar que las respuestas son verdaderas y estoy consciente de que cualquier falsedad será motivo de rechazo o despido.</label>
+                </div>
+                
+                <div class="checkbox">
+                    <input type="checkbox" name="DeclaracionDatos" id="decl2" value="Acepto" required>
+                    <label for="decl2">Autorizo a SOPORTE Y SERVICIOS EN PRODUCTOS INDUSTRIALES, S. DE R.L. DE C.V. a recabar y usar mis datos personales conforme a la Ley Federal de Protección de Datos Personales en Posesión de los Particulares.</label>
+                </div>
+                
+                <p style="text-align: center; margin-top: 30px; color: #666; font-size: 0.9rem;">
+                    Gracias por completar tu solicitud.<br>
+                    Presiona "Enviar" para finalizar.
+                </p>
+            </section>
+
+            <div class="button-group">
+                <button type="button" id="prevBtn" onclick="changeStep(-1)" disabled>Anterior</button>
+                <button type="button" id="nextBtn" onclick="changeStep(1)">Siguiente</button>
+            </div>
+        </form>
     </div>
 
-    <h1>Formulario de Contratación</h1>
-    <p>Complete los siguientes pasos para aplicar.</p>
+    <script>
+        // IMPORTANTE: Reemplaza esta URL con la URL de tu Google Apps Script
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxeeqe6v__T5JVaE-2LBt6M18K5LRdGiMTqe7w62Kt2zQQliYL2xLMFykqR7lw9szG4nQ/exec';
+        
+        let currentStep = 1;
+        const totalSteps = 9;
 
-    <div class="progress">
-      <div class="progress-bar" id="progressBar"></div>
-    </div>
+        function showStep(step) {
+            const sections = document.querySelectorAll('section');
+            sections.forEach(section => section.classList.remove('active'));
+            
+            const currentSection = document.querySelector(`section[data-step="${step}"]`);
+            if (currentSection) {
+                currentSection.classList.add('active');
+            }
+            
+            // Actualizar barra de progreso
+            const progress = (step / totalSteps) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+            
+            // Actualizar botones
+            document.getElementById('prevBtn').disabled = (step === 1);
+            
+            const nextBtn = document.getElementById('nextBtn');
+            if (step === totalSteps) {
+                nextBtn.textContent = 'Enviar';
+                nextBtn.style.background = 'var(--primary)';
+                nextBtn.style.color = 'white';
+            } else {
+                nextBtn.textContent = 'Siguiente';
+                nextBtn.style.background = 'var(--bg)';
+                nextBtn.style.color = 'var(--primary)';
+            }
+        }
 
-    <div class="alert" id="alertMsg">⚠️ Por favor, complete todos los campos obligatorios antes de continuar.</div>
+        function validateStep(step) {
+            const section = document.querySelector(`section[data-step="${step}"]`);
+            const inputs = section.querySelectorAll('input[required], select[required], textarea[required]');
+            
+            for (let input of inputs) {
+                if (!input.value.trim()) {
+                    showAlert('Por favor complete todos los campos requeridos (*)', 'error');
+                    input.focus();
+                    return false;
+                }
+            }
+            return true;
+        }
 
-    <!-- PASO 1 -->
-    <section class="active">
-      <h2>Datos Personales</h2>
-      <div class="row">
-        <div class="half">
-          <label class="required">Nombre(s)</label>
-          <input type="text" name="Nombre" required>
-        </div>
-        <div class="half">
-          <label class="required">Apellido Paterno</label>
-          <input type="text" name="ApellidoPaterno" required>
-        </div>
-      </div>
-      <div class="row">
-        <div class="half">
-          <label>Apellido Materno</label>
-          <input type="text" name="ApellidoMaterno">
-        </div>
-        <div class="half">
-          <label class="required">Teléfono</label>
-          <input type="tel" name="Telefono" required placeholder="55-1234-5678">
-        </div>
-      </div>
-      <div class="row">
-        <div class="half">
-          <label class="required">Correo Electrónico</label>
-          <input type="email" name="Email" required placeholder="ejemplo@correo.com">
-        </div>
-        <div class="half">
-          <label class="required">CURP</label>
-          <input type="text" name="CURP" required>
-        </div>
-      </div>
-      <label class="required">Dirección Completa</label>
-      <textarea rows="2" name="Direccion" required></textarea>
-    </section>
+        function changeStep(direction) {
+            if (direction === 1 && currentStep < totalSteps) {
+                if (!validateStep(currentStep)) return;
+                currentStep++;
+                showStep(currentStep);
+            } else if (direction === -1 && currentStep > 1) {
+                currentStep--;
+                showStep(currentStep);
+            } else if (currentStep === totalSteps && direction === 1) {
+                submitForm();
+            }
+            
+            // Scroll al inicio
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
 
-    <!-- PASO 2 -->
-    <section>
-      <h2>Información General</h2>
-      <div class="row">
-        <div class="half">
-          <label class="required">Fecha de Nacimiento</label>
-          <input type="date" name="FechaNacimiento" required>
-        </div>
-        <div class="half">
-          <label class="required">Estado Civil</label>
-          <select id="estadoCivil" name="EstadoCivil" required>
-            <option value="">Seleccione...</option>
-            <option>Soltero(a)</option>
-            <option>Casado(a)</option>
-            <option>Divorciado(a)</option>
-            <option>Viudo(a)</option>
-            <option>Unión Libre</option>
-          </select>
-        </div>
-      </div>
-      <div id="conyugeCampos" class="conditional">
-        <div class="row">
-          <div class="half">
-            <label>Nombre del Cónyuge</label>
-            <input type="text" name="NombreConyuge">
-          </div>
-          <div class="half">
-            <label>Ocupación del Cónyuge</label>
-            <input type="text" name="OcupacionConyuge">
-          </div>
-        </div>
-      </div>
-      <div class="row">
-        <div class="half">
-          <label class="required">RFC</label>
-          <input type="text" name="RFC" required>
-        </div>
-        <div class="half">
-          <label class="required">Nacionalidad</label>
-          <input type="text" name="Nacionalidad" required>
-        </div>
-      </div>
-      <label class="required">Lugar de Nacimiento</label>
-      <input type="text" name="LugarNacimiento" required>
+        async function submitForm() {
+            if (!validateStep(currentStep)) return;
+            
+            const formData = new FormData(document.getElementById('solicitudForm'));
+            const data = {};
+            
+            for (let [key, value] of formData.entries()) {
+                data[key] = value;
+            }
+            
+            data.Fecha = new Date().toLocaleString('es-MX');
+            
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                showAlert('¡Solicitud enviada exitosamente! Gracias por tu interés.', 'success');
+                document.getElementById('solicitudForm').reset();
+                currentStep = 1;
+                showStep(1);
+                
+            } catch (error) {
+                console.error('Error:', error);
+                showAlert('Error al enviar la solicitud. Por favor intenta nuevamente.', 'error');
+            }
+        }
 
-      <label>¿Cuenta con licencia para conducir?</label>
-      <select id="licenciaConducir" name="LicenciaConducir">
-        <option>No</option>
-        <option>Sí</option>
-      </select>
+        function showAlert(message, type) {
+            const alert = document.getElementById('alertMessage');
+            alert.textContent = message;
+            alert.className = 'alert ' + (type === 'error' ? 'error' : '');
+            alert.style.display = 'block';
+            
+            setTimeout(() => {
+                alert.style.display = 'none';
+            }, 5000);
+        }
 
-      <div id="licenciaCampos" class="conditional">
-        <div class="row">
-          <div class="half">
-            <label>Clase</label>
-            <input type="text" name="ClaseLicencia">
-          </div>
-          <div class="half">
-            <label>Número</label>
-            <input type="text" name="NumeroLicencia">
-          </div>
-        </div>
-        <label>¿Sabe manejar estándar?</label>
-        <select name="ManejaEstandar">
-          <option>No</option>
-          <option>Sí</option>
-        </select>
-      </div>
-
-      <div class="row">
-        <div class="half">
-          <label>¿Cuenta con cartilla militar?</label>
-          <select name="CartillaMilitar">
-            <option>No</option>
-            <option>Sí</option>
-          </select>
-        </div>
-        <div class="half">
-          <label>¿Cuenta con visa láser vigente?</label>
-          <select name="VisaLaser">
-            <option>No</option>
-            <option>Sí</option>
-          </select>
-        </div>
-      </div>
-    </section>
-
-    <!-- PASO 3 -->
-    <section>
-      <h2>Información Económica</h2>
-      <label>¿Cuenta con crédito INFONAVIT?</label>
-      <select id="infonavit" name="CreditoINFONAVIT">
-        <option>No</option>
-        <option>Sí</option>
-      </select>
-      <div id="infonavitCampos" class="conditional">
-        <div class="row">
-          <div class="half">
-            <label>No. de Crédito</label>
-            <input type="text" name="NumeroInfonavit">
-          </div>
-          <div class="half">
-            <label>Pago Semanal</label>
-            <input type="number" name="PagoInfonavit">
-          </div>
-        </div>
-      </div>
-
-      <label>¿Cuenta con crédito FONACOT?</label>
-      <select id="fonacot" name="CreditoFONACOT">
-        <option>No</option>
-        <option>Sí</option>
-      </select>
-      <div id="fonacotCampos" class="conditional">
-        <div class="row">
-          <div class="half">
-            <label>No. de Crédito</label>
-            <input type="text" name="NumeroFonacot">
-          </div>
-          <div class="half">
-            <label>Pago Semanal</label>
-            <input type="number" name="PagoFonacot">
-          </div>
-        </div>
-      </div>
-
-      <label>¿Tiene pensión alimenticia?</label>
-      <select id="pension" name="PensionAlimenticia">
-        <option>No</option>
-        <option>Sí</option>
-      </select>
-      <div id="pensionCampos" class="conditional">
-        <label>¿Qué cantidad paga?</label>
-        <input type="number" name="CantidadPension">
-      </div>
-    </section>
-
-    <!-- PASO 4 -->
-    <section>
-      <h2>Estado de Salud</h2>
-      <label class="required">Tipo de Sangre</label>
-      <select name="TipoSangre" required>
-        <option value="">Seleccione...</option>
-        <option>A+</option><option>A-</option>
-        <option>B+</option><option>B-</option>
-        <option>AB+</option><option>AB-</option>
-        <option>O+</option><option>O-</option>
-      </select>
-      <label class="required">NSS</label>
-      <input type="text" name="NSS" required>
-      <label>Enfermedad o condición médica</label>
-      <input type="text" name="Enfermedad">
-      <label>Alergias</label>
-      <input type="text" name="Alergias">
-      <label>Medicamento Regular</label>
-      <input type="text" name="Medicamento">
-    </section>
-
-    <!-- PASO 5 -->
-    <section>
-      <h2>Contacto de Emergencia</h2>
-      <label class="required">Nombre Completo</label>
-      <input type="text" name="ContactoNombre" required>
-      <label class="required">Parentesco</label>
-      <input type="text" name="ContactoParentesco" required>
-      <label class="required">Dirección</label>
-      <input type="text" name="ContactoDireccion" required>
-      <label class="required">Teléfono</label>
-      <input type="tel" name="ContactoTelefono" required>
-    </section>
-
-    <!-- PASO 6 -->
-    <section>
-      <h2>Escolaridad</h2>
-      <label class="required">Nivel Educativo</label>
-      <select name="NivelEducativo" required>
-        <option value="">Seleccione...</option>
-        <option>Primaria</option><option>Secundaria</option>
-        <option>Preparatoria/Bachillerato</option>
-        <option>Licenciatura</option><option>Maestría</option>
-        <option>Doctorado</option>
-      </select>
-      <label class="required">Estatus</label>
-      <select name="EstatusEscolar" required>
-        <option value="">Seleccione...</option>
-        <option>Terminado</option><option>Trunco</option><option>En curso</option>
-      </select>
-      <label>Certificaciones o Cursos</label>
-      <textarea rows="2" name="Certificaciones"></textarea>
-      <div class="row">
-        <div class="half">
-          <label class="required">Inglés Hablado</label>
-          <select name="InglesHablado" required>
-            <option value="">Seleccione...</option>
-            <option>Principiante</option><option>Básico</option>
-            <option>Intermedio</option><option>Avanzado</option>
-            <option>Nativo</option>
-          </select>
-        </div>
-        <div class="half">
-          <label class="required">Inglés Escrito</label>
-          <select name="InglesEscrito" required>
-            <option value="">Seleccione...</option>
-            <option>Principiante</option><option>Básico</option>
-            <option>Intermedio</option><option>Avanzado</option>
-            <option>Nativo</option>
-          </select>
-        </div>
-      </div>
-    </section>
-
-    <!-- PASO 7 -->
-    <section>
-      <h2>Último Empleo</h2>
-      <label class="required">Empresa</label>
-      <input type="text" name="EmpresaUltimoEmpleo" required>
-      <label class="required">Puesto</label>
-      <input type="text" name="PuestoUltimoEmpleo" required>
-      <label>Actividades Realizadas</label>
-      <textarea rows="3" name="ActividadesUltimoEmpleo" placeholder="Describe brevemente tus principales funciones..."></textarea>
-    </section>
-
-    <!-- PASO 8 -->
-    <section>
-      <h2>Referencias Personales</h2>
-      <h3>Referencia 1</h3>
-      <label class="required">Nombre Completo</label>
-      <input type="text" name="Referencia1Nombre" required>
-      <label class="required">Teléfono</label>
-      <input type="tel" name="Referencia1Telefono" required>
-
-      <h3>Referencia 2</h3>
-      <label class="required">Nombre Completo</label>
-      <input type="text" name="Referencia2Nombre" required>
-      <label class="required">Teléfono</label>
-      <input type="tel" name="Referencia2Telefono" required>
-    </section>
-
-    <!-- PASO 9 -->
-    <section>
-      <h2>Declaración</h2>
-      <div class="checkbox">
-        <input type="checkbox" name="DeclaracionVeracidad" required>
-        <label>Hago constar que las respuestas son verdaderas y estoy consciente de que cualquier falsedad será motivo de rechazo o despido.</label>
-      </div>
-      <div class="checkbox">
-        <input type="checkbox" name="DeclaracionDatos" required>
-        <label>Autorizo a SOPORTE Y SERVICIOS EN PRODUCTOS INDUSTRIALES, S. DE R.L. DE C.V. a recabar y usar mis datos personales conforme a la Ley Federal de Protección de Datos Personales en Posesión de los Particulares.</label>
-      </div>
-      <p style="text-align:center; margin-top:20px; color:#555;">
-        <b>Gracias por completar tu solicitud.</b><br>
-        Presiona “Enviar” para finalizar.
-      </p>
-    </section>
-
-    <div class="button-group">
-      <button type="button" id="prevBtn">Anterior</button>
-      <button type="button" id="nextBtn">Siguiente</button>
-    </div>
-    <!-- Mensaje de estado de envío -->
-  <div id="statusMsg" class="alert" style="display:none; background:#cce5ff; color:#004085;">Enviando...</div>
-  </form>
-<script>
-const sections = document.querySelectorAll('section');
-const nextBtn = document.getElementById('nextBtn');
-const prevBtn = document.getElementById('prevBtn');
-const progressBar = document.getElementById('progressBar');
-const alertMsg = document.getElementById('alertMsg');
-let current = 0;
-
-function showStep(index){
-  sections.forEach((sec,i)=>sec.classList.toggle('active',i===index));
-  prevBtn.disabled=index===0;
-  nextBtn.textContent=index===sections.length-1?'Enviar':'Siguiente';
-  progressBar.style.width=((index+1)/sections.length)*100+'%';
-  alertMsg.style.display='none';
-}
-
-function validateSection(section){
-  const requiredFields=section.querySelectorAll('[required]');
-  for(const f of requiredFields){
-    if((f.type==='checkbox'&&!f.checked)||(!f.value||!f.value.trim())){f.focus();return false;}
-  }
-  return true;
-}
-
-function buildFormData(){
-  const data={};
-  document.querySelectorAll('input,select,textarea').forEach(el=>{
-    const key=el.name?.trim(); if(!key)return;
-    data[key]=el.type==='checkbox'?(el.checked?'Sí':'No'):(el.value||'');
-  });
-  return data;
-}
-
-function submitFormViaIframe(formData,url){
-  return new Promise((resolve,reject)=>{
-    let iframe=document.getElementById('gs-target-iframe');
-    if(!iframe){
-      iframe=document.createElement('iframe');
-      iframe.id='gs-target-iframe';iframe.name='gs-target-iframe';
-      iframe.style.display='none';document.body.appendChild(iframe);
-    }
-    function onMsg(e){window.removeEventListener('message',onMsg);
-      try{if(e.data&&e.data.result==='success')resolve({ok:true});else reject();}catch(err){reject(err);}
-    }
-    window.addEventListener('message',onMsg);
-    const form=document.createElement('form');form.style.display='none';
-    form.method='POST';form.action=url;form.target=iframe.name;
-    for(const k in formData){
-      const i=document.createElement('input');i.type='hidden';i.name=k;i.value=formData[k];form.appendChild(i);
-    }
-    document.body.appendChild(form);form.submit();setTimeout(()=>form.remove(),2000);
-  });
-}
-
-const SCRIPT_URL="https://script.google.com/macros/s/AKfycbw496Fmw32LD_D9Hv3wYSzoTfYtcm7uRzFnNhOPr2FMpy8PECf2erSiT_z8H7vVV64NRQ/exec";
-
-nextBtn.addEventListener('click',()=>{
-  const sec=sections[current];
-  if(!validateSection(sec)){alertMsg.style.display='block';return;}
-  if(current<sections.length-1){current++;showStep(current);}
-  else{
-    const formData=buildFormData();
-    nextBtn.disabled=true;prevBtn.disabled=true;alertMsg.style.display='none';
-    nextBtn.textContent='Enviando...';
-    progressBar.style.width='0';let p=0;
-    const interval=setInterval(()=>{p+=5;if(p>95)p=95;progressBar.style.width=p+'%';},100);
-    submitFormViaIframe(formData,SCRIPT_URL).catch(()=>{});
-    setTimeout(()=>{
-      clearInterval(interval);
-      progressBar.style.width='100%';
-      nextBtn.textContent='✅ Tu solicitud se registró correctamente';
-      nextBtn.style.background='#4ade80';nextBtn.style.color='#fff';
-      setTimeout(()=>window.location.reload(),1800);
-    },1000);
-  }
-});
-
-prevBtn.addEventListener('click',()=>{if(current>0)current--;showStep(current);});
-showStep(current);
-</script>
+        // Inicializar
+        showStep(1);
+    </script>
 </body>
 </html>
 
+<!-- 
+CÓDIGO PARA GOOGLE APPS SCRIPT:
+Copia este código en tu Google Apps Script (Extensiones → Apps Script)
 
+function doPost(e) {
+  try {
+    var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    var data = JSON.parse(e.postData.contents);
+    
+    // Si es la primera vez, agregar encabezados
+    if (sheet.getLastRow() === 0) {
+      sheet.appendRow([
+        'ID',
+        'Fecha',
+        'Nombre',
+        'ApellidoPaterno',
+        'ApellidoMaterno',
+        'Telefono',
+        'Email',
+        'CURP',
+        'Direccion',
+        'FechaNacimiento',
+        'EstadoCivil',
+        'NombreConyuge',
+        'OcupacionConyuge',
+        'RFC',
+        'Nacionalidad',
+        'LugarNacimiento',
+        'LicenciaConducir',
+        'ClaseLicencia',
+        'NumeroLicencia',
+        'ManejaEstandar',
+        'CartillaMilitar',
+        'VisaLaser',
+        'CreditoINFONAVIT',
+        'NumeroInfonavit',
+        'PagoInfonavit',
+        'CreditoFONACOT',
+        'NumeroFonacot',
+        'PagoFonacot',
+        'PensionAlimenticia',
+        'CantidadPension',
+        'TipoSangre',
+        'NSS',
+        'Enfermedad',
+        'Alergias',
+        'Medicamento',
+        'ContactoNombre',
+        'ContactoParentesco',
+        'ContactoDireccion',
+        'ContactoTelefono',
+        'NivelEducativo',
+        'EstatusEscolar',
+        'Certificaciones',
+        'InglesHablado',
+        'InglesEscrito',
+        'EmpresaUltimoEmpleo',
+        'PuestoUltimoEmpleo',
+        'ActividadesUltimoEmpleo',
+        'Referencia1Nombre',
+        'Referencia1Telefono',
+        'Referencia2Nombre',
+        'Referencia2Telefono',
+        'DeclaracionVeracidad',
+        'DeclaracionDatos'
+      ]);
+    }
+    
+    // Calcular el siguiente índice
+    var lastRow = sheet.getLastRow();
+    var nextIndex = lastRow;
+    var indexId = 'A' + String(nextIndex).padStart(2, '0');
+    
+    // Agregar los datos
+    sheet.appendRow([
+      indexId,
+      data.Fecha || '',
+      data.Nombre || '',
+      data.ApellidoPaterno || '',
+      data.ApellidoMaterno || '',
+      data.Telefono || '',
+      data.Email || '',
+      data.CURP || '',
+      data.Direccion || '',
+      data.FechaNacimiento || '',
+      data.EstadoCivil || '',
+      data.NombreConyuge || '',
+      data.OcupacionConyuge || '',
+      data.RFC || '',
+      data.Nacionalidad || '',
+      data.LugarNacimiento || '',
+      data.LicenciaConducir || '',
+      data.ClaseLicencia || '',
+      data.NumeroLicencia || '',
+      data.ManejaEstandar || '',
+      data.CartillaMilitar || '',
+      data.VisaLaser || '',
+      data.CreditoINFONAVIT || '',
+      data.NumeroInfonavit || '',
+      data.PagoInfonavit || '',
+      data.CreditoFONACOT || '',
+      data.NumeroFonacot || '',
+      data.PagoFonacot || '',
+      data.PensionAlimenticia || '',
+      data.CantidadPension || '',
+      data.TipoSangre || '',
+      data.NSS || '',
+      data.Enfermedad || '',
+      data.Alergias || '',
+      data.Medicamento || '',
+      data.ContactoNombre || '',
+      data.ContactoParentesco || '',
+      data.ContactoDireccion || '',
+      data.ContactoTelefono || '',
+      data.NivelEducativo || '',
+      data.EstatusEscolar || '',
+      data.Certificaciones || '',
+      data.InglesHablado || '',
+      data.InglesEscrito || '',
+      data.EmpresaUltimoEmpleo || '',
+      data.PuestoUltimoEmpleo || '',
+      data.ActividadesUltimoEmpleo || '',
+      data.Referencia1Nombre || '',
+      data.Referencia1Telefono || '',
+      data.Referencia2Nombre || '',
+      data.Referencia2Telefono || '',
+      data.DeclaracionVeracidad || '',
+      data.DeclaracionDatos || ''
+    ]);
+    
+    return ContentService.createTextOutput(JSON.stringify({status: 'success', id: indexId}))
+      .setMimeType(ContentService.MimeType.JSON);
+      
+  } catch (error) {
+    return ContentService.createTextOutput(JSON.stringify({status: 'error', message: error.toString()}))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
 
-
-
+function doGet(e) {
+  return doPost(e);
+}
+-->
 
 
 
